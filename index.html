@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Uang Kas Digital</title>
 
-  <!-- FAVICON FLATICON -->
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/781/781760.png">
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -27,12 +25,9 @@
       }
     }
   </script>
-  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- EMBEDDED STYLESHEET.HTML -->
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
@@ -92,7 +87,6 @@
     }
   </style>
 
-  <!-- ADAPTER BRIDGE DENGAN LINK APPS SCRIPT LENGKAP -->
   <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby0DQ130inwA5uzOliyDH2MxJVyIN8iKyG7LrMfopqmgZVd44U4Zq9-O0PIi10Zionr/exec";
 
@@ -130,10 +124,8 @@
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pb-24 select-none antialiased overflow-x-hidden">
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs px-4 pointer-events-none"></div>
 
-  <!-- MODAL KONFIRMASI -->
   <div id="modalConfirm" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-2xl p-5 text-center space-y-4 shadow-2xl border border-gray-100 dark:border-gray-700">
       <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto text-2xl">
@@ -150,7 +142,6 @@
     </div>
   </div>
 
-  <!-- LOGIN SECTION (DILENGKAPI AUTOCOMPLETE ATTRIBUTES) -->
   <div id="loginView" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm">
     <div class="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700">
       <div class="text-center mb-6">
@@ -185,7 +176,6 @@
     </div>
   </div>
 
-  <!-- MAIN APP SECTION -->
   <div id="appView" class="hidden">
     <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors">
       <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
@@ -213,19 +203,11 @@
     </header>
 
     <main class="max-w-md mx-auto px-4 pt-4">
-      <!-- TAB KAS -->
       <div id="tab-kas" class="tab-content">
         <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-blue-500/20 mb-4 relative overflow-hidden">
           <div class="relative z-10">
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs text-blue-100/80 font-medium">Total Saldo Kas</span>
-              <div class="relative">
-                <button onclick="toggleDropdown('dompetMenuOptions')" class="flex items-center gap-1 text-[11px] bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/20 transition">
-                  <span id="selectedDompetLabel" class="truncate max-w-[80px]">Semua Dompet</span>
-                  <i class="ph ph-caret-down"></i>
-                </button>
-                <div id="dompetMenuOptions" class="hidden absolute right-0 top-full mt-1.5 w-40 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl py-1 z-50 text-xs max-h-48 overflow-y-auto"></div>
-              </div>
             </div>
             <h2 id="totalSaldo" class="text-2xl font-black tracking-tight">Rp 0</h2>
             <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/10">
@@ -241,24 +223,18 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="grid grid-cols-2 gap-2 mb-4">
           <button onclick="openModal('modalInputKas')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
             <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1">
               <i class="ph ph-plus text-base"></i>
             </div>
             <span class="text-[11px] font-semibold">Transaksi</span>
           </button>
-          <button onclick="openModal('modalTransfer')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
+          <button onclick="loadKasData()" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
             <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
-              <i class="ph ph-arrows-left-right text-base"></i>
+              <i class="ph ph-arrows-clockwise text-base"></i>
             </div>
-            <span class="text-[11px] font-semibold">Transfer</span>
-          </button>
-          <button onclick="openModal('modalAnalytics')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
-            <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-1">
-              <i class="ph ph-chart-pie text-base"></i>
-            </div>
-            <span class="text-[11px] font-semibold">Analisis</span>
+            <span class="text-[11px] font-semibold">Refresh</span>
           </button>
         </div>
 
@@ -273,7 +249,6 @@
         </div>
       </div>
 
-      <!-- TAB HUTANG -->
       <div id="tab-hutang" class="tab-content hidden">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-sm font-bold">Hutang & Piutang</h2>
@@ -286,7 +261,6 @@
         </div>
       </div>
 
-      <!-- TAB SOKONGAN -->
       <div id="tab-sokongan" class="tab-content hidden">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-sm font-bold">Data Sokongan / Donasi</h2>
@@ -299,7 +273,6 @@
         </div>
       </div>
 
-      <!-- TAB SETTINGS -->
       <div id="tab-settings" class="tab-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
           <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
@@ -308,15 +281,9 @@
             + Tambah Dompet Baru
           </button>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Audit Trail / Riwayat Aktivitas</h3>
-          <input type="text" id="searchLogInput" onkeyup="renderActivityLogs()" placeholder="Cari log aktivitas..." class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 mb-3 bg-gray-50 dark:bg-gray-900">
-          <div id="logListContainer" class="space-y-2 max-h-56 overflow-y-auto"></div>
-        </div>
       </div>
     </main>
 
-    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40">
       <div class="max-w-md mx-auto grid grid-cols-4 py-2">
         <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400">
@@ -339,7 +306,6 @@
     </nav>
   </div>
 
-  <!-- MODAL INPUT KAS -->
   <div id="modalInputKas" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -367,45 +333,6 @@
     </div>
   </div>
 
-  <!-- MODAL TRANSFER -->
-  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Transfer Antar Dompet</h3>
-        <button onclick="closeModal('modalTransfer')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <form onsubmit="submitTransfer(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-semibold">Dari Dompet</label>
-          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold">Ke Dompet</label>
-          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Proses Transfer</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL ANALYTICS -->
-  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Analisis Grafik Keuangan</h3>
-        <button onclick="closeModal('modalAnalytics')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <div class="p-2 bg-gray-50 dark:bg-gray-900 rounded-2xl border dark:border-gray-700">
-        <canvas id="kasChart" class="w-full max-h-60"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL MASTER DOMPET -->
   <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -422,7 +349,6 @@
     </div>
   </div>
 
-  <!-- MODAL INPUT HUTANG -->
   <div id="modalInputHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -454,7 +380,6 @@
     </div>
   </div>
 
-  <!-- MODAL INPUT SOKONGAN -->
   <div id="modalInputSokongan" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -486,14 +411,11 @@
     </div>
   </div>
 
-  <!-- EMBEDDED JAVASCRIPT LOGIC -->
   <script>
     let currentUser = null;
     let rawKasItems = [];
     let walletList = [];
-    let activityLogs = JSON.parse(localStorage.getItem('app_activity_logs') || '[]');
     let isBalanceVisible = localStorage.getItem('balance_visible') !== 'false';
-    let selectedFilterWallet = 'ALL';
     let pendingConfirmCallback = null;
 
     function formatNumberInput(element) {
@@ -596,7 +518,7 @@
         } else {
           showToast(res.message, 'error');
         }
-      }).processClientRequest({ action: 'checkLogin', username: u, password: p });
+      }).processClientRequest({ action: 'login', username: u, password: p });
     }
 
     function handleLogout() {
@@ -627,7 +549,6 @@
           if (nav) nav.className = "flex flex-col items-center justify-center text-gray-400";
         }
       });
-      if (tabName === 'settings') renderActivityLogs();
     }
 
     function loadKasData() {
@@ -645,16 +566,10 @@
       const container = document.getElementById('kasListContainer');
       let totalSaldo = 0, totalMasuk = 0, totalKeluar = 0;
 
-      let filtered = rawKasItems.filter(item => {
-        const itemDompet = item.dompet || item.Dompet;
-        if (selectedFilterWallet !== 'ALL' && itemDompet !== selectedFilterWallet) return false;
-        return true;
-      });
-
-      if (!filtered.length) {
+      if (!rawKasItems.length) {
         container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada transaksi.</p>`;
       } else {
-        container.innerHTML = filtered.map(item => {
+        container.innerHTML = rawKasItems.map(item => {
           const tipe = item.tipe || item.Type;
           const isMasuk = tipe === 'MASUK' || tipe === 'Pemasukan';
           const val = Number(item.jumlah || item.Amount || 0);
@@ -681,16 +596,11 @@
       document.getElementById('totalSaldo').innerText = isBalanceVisible ? `Rp ${totalSaldo.toLocaleString('id-ID')}` : '••••••••';
       document.getElementById('totalMasuk').innerText = isBalanceVisible ? `Rp ${totalMasuk.toLocaleString('id-ID')}` : '••••••••';
       document.getElementById('totalKeluar').innerText = isBalanceVisible ? `Rp ${totalKeluar.toLocaleString('id-ID')}` : '••••••••';
-      document.getElementById('kasCountLabel').innerText = `${filtered.length} data`;
+      document.getElementById('kasCountLabel').innerText = `${rawKasItems.length} data`;
     }
 
     function populateDompetDropdowns() {
-      const trfFrom = document.getElementById('trfFrom');
-      const trfTo = document.getElementById('trfTo');
       const masterList = document.getElementById('dompetMasterList');
-
-      if (trfFrom) trfFrom.innerHTML = walletList.map(w => `<option value="${w}">${w}</option>`).join('');
-      if (trfTo) trfTo.innerHTML = walletList.map(w => `<option value="${w}">${w}</option>`).join('');
       if (masterList) {
         masterList.innerHTML = walletList.map(w => `
           <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
@@ -729,24 +639,6 @@
           }
         }).processClientRequest({ action: 'deleteKas', id: id });
       });
-    }
-
-    function submitTransfer(e) {
-      e.preventDefault();
-      const from = document.getElementById('trfFrom').value;
-      const to = document.getElementById('trfTo').value;
-      const val = getUnformattedNumber('trfJumlah');
-
-      if (from === to) { showToast('Dompet asal dan tujuan tidak boleh sama', 'error'); return; }
-
-      google.script.run.withSuccessHandler(res => {
-        if (res.status === 'success') {
-          showToast('Transfer berhasil diselesaikan', 'success');
-          closeModal('modalTransfer');
-          document.getElementById('trfJumlah').value = '';
-          loadKasData();
-        }
-      }).processClientRequest({ action: 'transferSaldo', from: from, to: to, jumlah: val });
     }
 
     function submitAddDompet(e) {
@@ -848,24 +740,6 @@
           loadSokonganData();
         }
       }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
-    }
-
-    function renderActivityLogs() {
-      const container = document.getElementById('logListContainer');
-      if (!container) return;
-      if (!activityLogs.length) {
-        container.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Belum ada aktivitas terrekam.</div>';
-        return;
-      }
-      container.innerHTML = activityLogs.map(l => `
-        <div class="p-2 bg-gray-50 dark:bg-gray-900 rounded-xl text-[10px]">
-          <div class="flex justify-between font-bold text-blue-500">
-            <span>${l.user || 'Sistem'}</span>
-            <span class="text-gray-400">${l.timestamp || ''}</span>
-          </div>
-          <p class="text-gray-700 dark:text-gray-300">${l.action}</p>
-        </div>
-      `).join('');
     }
   </script>
 </body>
