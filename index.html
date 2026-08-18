@@ -166,6 +166,9 @@
           </div>
         </div>
         <div class="flex items-center gap-1">
+          <button onclick="syncAppData()" class="p-1.5 rounded-full text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Refresh Sync Data">
+            <i class="ph ph-arrows-clockwise text-base"></i>
+          </button>
           <button onclick="toggleDarkMode()" class="p-1.5 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Toggle Mode Gelap">
             <i id="themeIcon" class="ph ph-moon text-base"></i>
           </button>
@@ -295,6 +298,22 @@
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
+          <div id="dompetMasterList" class="space-y-2 mb-3"></div>
+          <button onclick="openModal('modalInputDompet')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
+            + Tambah Dompet Baru
+          </button>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Kategori Transaksi</h3>
+          <div id="categoryMasterList" class="space-y-2 mb-3"></div>
+          <button onclick="openModal('modalInputCategory')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
+            + Tambah Kategori Baru
+          </button>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
           <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Export Laporan Rapi</h3>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="exportToPDF()" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
@@ -351,6 +370,14 @@
           </select>
         </div>
         <div>
+          <label class="text-[10px] font-semibold">Pilih Dompet</label>
+          <select id="kasDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Pilih Kategori</label>
+          <select id="kasCategorySelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="kasJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
@@ -363,6 +390,60 @@
     </div>
   </div>
 
+  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Transfer Antar Dompet</h3>
+        <button onclick="closeModal('modalTransfer')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitTransfer(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Dari Dompet</label>
+          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Ke Dompet</label>
+          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
+          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Proses Transfer</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Analisis Grafik Keuangan</h3>
+        <button onclick="closeModal('modalAnalytics')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] font-semibold block mb-1">Dimensi</label>
+          <select id="chartDimensionSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            <option value="dompet">Per Dompet</option>
+            <option value="kategori">Per Kategori</option>
+            <option value="flow">Cashflow (Masuk/Keluar)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold block mb-1">Tipe Grafik</label>
+          <select id="chartTypeSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            <option value="doughnut">Donut / Lingkaran</option>
+            <option value="bar">Diagram Batang</option>
+            <option value="line">Garis Trend</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border dark:border-gray-700">
+        <canvas id="kasChart" class="w-full max-h-56"></canvas>
+      </div>
+    </div>
+  </div>
+
   <div id="modalPayHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -372,10 +453,50 @@
       <form onsubmit="submitPayHutang(event)" class="space-y-3">
         <input type="hidden" id="payHutangId">
         <div>
+          <label class="text-[10px] font-semibold">Sumber Dompet</label>
+          <select id="cclDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
           <label class="text-[10px] font-semibold">Jumlah Pembayaran (Rp)</label>
           <input type="text" id="payHutangAmount" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
+        <div>
+          <label class="text-[10px] font-semibold">Keterangan Cicilan</label>
+          <input type="text" id="payHutangKet" placeholder="Cicilan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
         <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Pembayaran</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Tambah Dompet Baru</h3>
+        <button onclick="closeModal('modalInputDompet')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitAddDompet(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Nama Dompet</label>
+          <input type="text" id="newDompetName" required placeholder="Contoh: Rekening BCA" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Dompet</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalInputCategory" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Tambah Kategori Baru</h3>
+        <button onclick="closeModal('modalInputCategory')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitAddCategory(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Nama Kategori</label>
+          <input type="text" id="newCategoryName" required placeholder="Contoh: Hiburan, Operasional" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Kategori</button>
       </form>
     </div>
   </div>
@@ -401,6 +522,10 @@
         <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="htgJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Keterangan</label>
+          <input type="text" id="htgKet" placeholder="Catatan opsional..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
         <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Catatan</button>
       </form>
@@ -429,6 +554,10 @@
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="sokonganJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
+        <div>
+          <label class="text-[10px] font-semibold">Keterangan</label>
+          <input type="text" id="sokonganKet" placeholder="Keterangan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
         <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Donasi</button>
       </form>
     </div>
@@ -436,12 +565,15 @@
 
   <script>
     let currentUser = null;
-    let rawKasItems = [];
-    let rawHutangItems = [];
-    let rawSokonganItems = [];
+    let rawKasItems = JSON.parse(localStorage.getItem('cache_kas') || '[]');
+    let walletList = JSON.parse(localStorage.getItem('cache_wallets') || '["Utama"]');
+    let rawHutangItems = JSON.parse(localStorage.getItem('cache_hutang') || '[]');
+    let rawSokonganItems = JSON.parse(localStorage.getItem('cache_sokongan') || '[]');
+    let categoryList = JSON.parse(localStorage.getItem('app_categories') || '["Umum", "Makanan", "Belanja", "Transportasi", "Operasional", "Transfer"]');
     let activityLogs = JSON.parse(localStorage.getItem('app_activity_logs') || '[]');
     let isBalanceVisible = localStorage.getItem('balance_visible') !== 'false';
     let pendingConfirmCallback = null;
+    let mainKasChartInstance = null;
 
     function formatNumberInput(element) {
       if (!element) return;
@@ -560,7 +692,7 @@
       pendingConfirmCallback = null;
     }
 
-    // LOGIN & DIRECT FETCH DATA
+    // LOGIN & USER PROFILE
     function handleLogin(e) {
       e.preventDefault();
       const u = document.getElementById('loginUsername').value;
@@ -590,21 +722,49 @@
       document.getElementById('loginView').classList.remove('hidden');
     }
 
-    // MEMUAT DATA SECARA LANGSUNG SETELAH SHOW APP
+    // SUPER FAST INSTANT DISPLAY DENGAN LOCAL STORAGE CACHE & PARALLEL FETCHING
     function showApp() {
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('appView').classList.remove('hidden');
       document.getElementById('userStatus').innerText = currentUser.namaLengkap || currentUser.username;
       
-      // Load Profile Input Data
       document.getElementById('profileNamaLengkap').value = currentUser.namaLengkap || '';
       document.getElementById('profileUsername').value = currentUser.username || '';
 
-      // Direct Fetch All Data Immediately
-      loadKasData();
-      loadHutangData();
-      loadSokonganData();
+      // 1. RENDER INSTAN DARI LOCAL CACHE (0.001 DETIK)
+      renderKasList();
+      renderHutangList();
+      renderSokonganList();
+      populateDompetDropdowns();
+      populateCategoryDropdowns();
       renderActivityLogs();
+
+      // 2. BACKGROUND SYNC PARALEL DARI SPREADSHEET
+      syncAppData();
+    }
+
+    function syncAppData() {
+      google.script.run.withSuccessHandler(res => {
+        if (res.status === 'success') {
+          rawKasItems = res.kas || [];
+          walletList = res.wallets || ["Utama"];
+          rawHutangItems = res.hutang || [];
+          rawSokonganItems = res.sokongan || [];
+
+          // SIMPAN REFRESHED DATA KE CACHE
+          localStorage.setItem('cache_kas', JSON.stringify(rawKasItems));
+          localStorage.setItem('cache_wallets', JSON.stringify(walletList));
+          localStorage.setItem('cache_hutang', JSON.stringify(rawHutangItems));
+          localStorage.setItem('cache_sokongan', JSON.stringify(rawSokonganItems));
+
+          // UPDATE RENDERING Halaman Web
+          renderKasList();
+          renderHutangList();
+          renderSokonganList();
+          populateDompetDropdowns();
+          populateCategoryDropdowns();
+        }
+      }).processClientRequest({ action: 'getAllAppData' });
     }
 
     function switchTab(tabName) {
@@ -622,15 +782,7 @@
       if (tabName === 'settings') renderActivityLogs();
     }
 
-    function loadKasData() {
-      google.script.run.withSuccessHandler(res => {
-        if (res.status === 'success') {
-          rawKasItems = res.data || [];
-          renderKasList();
-        }
-      }).processClientRequest({ action: 'getKasData' });
-    }
-
+    // KAS & DOMPET LOGIC
     function renderKasList() {
       const container = document.getElementById('kasListContainer');
       let totalSaldo = 0, totalMasuk = 0, totalKeluar = 0;
@@ -648,7 +800,7 @@
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
               <div>
                 <p class="text-xs font-bold">${item.keterangan || item.Description || 'Transaksi'}</p>
-                <span class="text-[10px] text-gray-400">${item.dompet || 'Utama'}</span>
+                <span class="text-[10px] text-gray-400">${item.dompet || 'Utama'} • ${item.kategori || 'Umum'}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
@@ -668,22 +820,92 @@
       document.getElementById('kasCountLabel').innerText = `${rawKasItems.length} data`;
     }
 
+    function populateDompetDropdowns() {
+      const trfFrom = document.getElementById('trfFrom');
+      const trfTo = document.getElementById('trfTo');
+      const kasDompetSelect = document.getElementById('kasDompetSelect');
+      const cclDompetSelect = document.getElementById('cclDompetSelect');
+      const masterList = document.getElementById('dompetMasterList');
+
+      const optionsHtml = walletList.map(w => `<option value="${w}">${w}</option>`).join('');
+      if (trfFrom) trfFrom.innerHTML = optionsHtml;
+      if (trfTo) trfTo.innerHTML = optionsHtml;
+      if (kasDompetSelect) kasDompetSelect.innerHTML = optionsHtml;
+      if (cclDompetSelect) cclDompetSelect.innerHTML = optionsHtml;
+
+      if (masterList) {
+        masterList.innerHTML = walletList.map(w => `
+          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
+            <span>${w}</span>
+            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function populateCategoryDropdowns() {
+      const sel = document.getElementById('kasCategorySelect');
+      if (sel) {
+        sel.innerHTML = categoryList.map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+      renderCategoryMaster();
+    }
+
+    function renderCategoryMaster() {
+      const masterList = document.getElementById('categoryMasterList');
+      if (masterList) {
+        masterList.innerHTML = categoryList.map(c => `
+          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
+            <span>${c}</span>
+            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function submitAddCategory(e) {
+      e.preventDefault();
+      const input = document.getElementById('newCategoryName');
+      const val = input.value.trim();
+      if (val && !categoryList.includes(val)) {
+        categoryList.push(val);
+        localStorage.setItem('app_categories', JSON.stringify(categoryList));
+        populateCategoryDropdowns();
+        closeModal('modalInputCategory');
+        input.value = '';
+        logActivity('Tambah Kategori', `Menambah kategori: ${val}`);
+        showToast(`Kategori "${val}" ditambahkan`, 'success');
+      }
+    }
+
+    function deleteCategory(name) {
+      showConfirm('Hapus Kategori', `Hapus kategori "${name}"?`, () => {
+        categoryList = categoryList.filter(c => c !== name);
+        localStorage.setItem('app_categories', JSON.stringify(categoryList));
+        populateCategoryDropdowns();
+        logActivity('Hapus Kategori', `Menghapus kategori: ${name}`);
+        showToast(`Kategori "${name}" dihapus`, 'success');
+      });
+    }
+
     function submitAddKas(e) {
       e.preventDefault();
       const tipe = document.getElementById('kasTipe').value;
+      const dompet = document.getElementById('kasDompetSelect').value;
+      const kategori = document.getElementById('kasCategorySelect').value;
       const jumlah = getUnformattedNumber('kasJumlah');
       const ket = document.getElementById('kasKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          logActivity('Tambah Transaksi', `Tambah kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          logActivity('Tambah Transaksi', `Kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
           showToast('Transaksi disimpan!', 'success');
           closeModal('modalInputKas');
           document.getElementById('kasJumlah').value = '';
           document.getElementById('kasKet').value = '';
-          loadKasData();
+          syncAppData();
         }
-      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket });
+      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket, dompet: dompet, kategori: kategori });
     }
 
     function deleteKas(id) {
@@ -691,23 +913,61 @@
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
             logActivity('Hapus Transaksi', `Hapus kas ID: ${id}`);
-            loadKasData();
+            syncAppData();
             showToast('Transaksi dihapus', 'success');
           }
         }).processClientRequest({ action: 'deleteKas', id: id });
       });
     }
 
-    // ACCORDION HUTANG DETIL SMOOTH + CARD TOTAL
-    function loadHutangData() {
+    function submitTransfer(e) {
+      e.preventDefault();
+      const from = document.getElementById('trfFrom').value;
+      const to = document.getElementById('trfTo').value;
+      const val = getUnformattedNumber('trfJumlah');
+
+      if (from === to) { showToast('Dompet asal dan tujuan tidak boleh sama', 'error'); return; }
+
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          rawHutangItems = res.data || [];
-          renderHutangList();
+          logActivity('Transfer Saldo', `Transfer Rp ${val.toLocaleString('id-ID')} dari ${from} ke ${to}`);
+          showToast('Transfer diselesaikan', 'success');
+          closeModal('modalTransfer');
+          document.getElementById('trfJumlah').value = '';
+          syncAppData();
         }
-      }).processClientRequest({ action: 'getHutangData' });
+      }).processClientRequest({ action: 'transferSaldo', from: from, to: to, jumlah: val });
     }
 
+    function submitAddDompet(e) {
+      e.preventDefault();
+      const name = document.getElementById('newDompetName').value.trim();
+      if (name) {
+        google.script.run.withSuccessHandler(res => {
+          if (res.status === 'success') {
+            logActivity('Tambah Dompet', `Menambah dompet: ${name}`);
+            closeModal('modalInputDompet');
+            document.getElementById('newDompetName').value = '';
+            syncAppData();
+            showToast(`Dompet "${name}" ditambahkan`, 'success');
+          }
+        }).processClientRequest({ action: 'addDompet', name: name });
+      }
+    }
+
+    function deleteDompet(name) {
+      showConfirm('Hapus Dompet', `Hapus dompet "${name}"?`, () => {
+        google.script.run.withSuccessHandler(res => {
+          if (res.status === 'success') {
+            logActivity('Hapus Dompet', `Menghapus dompet: ${name}`);
+            syncAppData();
+            showToast(`Dompet "${name}" dihapus`, 'success');
+          }
+        }).processClientRequest({ action: 'deleteDompet', name: name });
+      });
+    }
+
+    // ACCORDION HUTANG SMOOTH DETIL & CICILAN
     function renderHutangList() {
       const container = document.getElementById('hutangListContainer');
       let totalHutang = 0, totalSisa = 0;
@@ -792,16 +1052,18 @@
       e.preventDefault();
       const id = document.getElementById('payHutangId').value;
       const amount = getUnformattedNumber('payHutangAmount');
+      const dompet = document.getElementById('cclDompetSelect').value;
+      const ket = document.getElementById('payHutangKet').value;
+
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
           logActivity('Bayar Hutang', `Bayar cicilan ID ${id}: Rp ${amount.toLocaleString('id-ID')}`);
-          showToast('Cicilan berhasil dibayarkan!', 'success');
+          showToast('Cicilan dibayarkan!', 'success');
           closeModal('modalPayHutang');
           document.getElementById('payHutangAmount').value = '';
-          loadHutangData();
-          loadKasData();
+          syncAppData();
         }
-      }).processClientRequest({ action: 'payHutang', id: id, amount: amount });
+      }).processClientRequest({ action: 'payHutang', id: id, amount: amount, dompet: dompet, keterangan: ket });
     }
 
     function submitAddHutang(e) {
@@ -809,39 +1071,31 @@
       const tipe = document.getElementById('htgTipe').value;
       const nama = document.getElementById('htgNama').value;
       const jumlah = getUnformattedNumber('htgJumlah');
+      const ket = document.getElementById('htgKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
           logActivity('Tambah Hutang', `Tambah ${tipe} ${nama}: Rp ${jumlah.toLocaleString('id-ID')}`);
           showToast('Catatan hutang dibuat', 'success');
           closeModal('modalInputHutang');
-          loadHutangData();
+          syncAppData();
         }
-      }).processClientRequest({ action: 'addHutang', tipe: tipe, nama: nama, jumlah: jumlah });
+      }).processClientRequest({ action: 'addHutang', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
     }
 
     function deleteHutang(id) {
       showConfirm('Hapus Catatan', 'Hapus catatan hutang ini?', () => {
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
-            logActivity('Hapus Hutang', `Menghapus hutang ID: ${id}`);
-            loadHutangData();
+            logActivity('Hapus Hutang', `Hapus hutang ID: ${id}`);
+            syncAppData();
             showToast('Catatan dihapus', 'success');
           }
         }).processClientRequest({ action: 'deleteHutang', id: id });
       });
     }
 
-    // DANA SOKONGAN INDEPENDEN (TERPISAH DARI PEMASUKAN KAS)
-    function loadSokonganData() {
-      google.script.run.withSuccessHandler(res => {
-        if (res.status === 'success') {
-          rawSokonganItems = res.data || [];
-          renderSokonganList();
-        }
-      }).processClientRequest({ action: 'getSokonganData' });
-    }
-
+    // DANA SOKONGAN INDEPENDEN
     function renderSokonganList() {
       const container = document.getElementById('sokonganListContainer');
       let totalSokongan = 0;
@@ -873,18 +1127,19 @@
       const tipe = document.getElementById('sokonganTipe').value;
       const nama = document.getElementById('sokonganNama').value;
       const jumlah = getUnformattedNumber('sokonganJumlah');
+      const ket = document.getElementById('sokonganKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
           logActivity('Tambah Sokongan', `Tambah donasi ${nama}: Rp ${jumlah.toLocaleString('id-ID')}`);
           showToast('Data donasi disimpan', 'success');
           closeModal('modalInputSokongan');
-          loadSokonganData();
+          syncAppData();
         }
-      }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah });
+      }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
     }
 
-    // PROFIL PENGGUNA MANAGER
+    // PROFIL & EXPORT
     function submitUpdateProfile(e) {
       e.preventDefault();
       const newN = document.getElementById('profileNamaLengkap').value;
@@ -897,13 +1152,12 @@
           currentUser.username = newU;
           localStorage.setItem('user_kas', JSON.stringify(currentUser));
           document.getElementById('userStatus').innerText = newN || newU;
-          logActivity('Update Profil', 'Memperbarui data profil pengguna');
-          showToast('Profil berhasil diperbarui', 'success');
+          logActivity('Update Profil', 'Memperbarui profil pengguna');
+          showToast('Profil diperbarui', 'success');
         }
       }).processClientRequest({ action: 'updateProfile', oldUsername: currentUser.username, newUsername: newU, newPassword: newP, newNamaLengkap: newN });
     }
 
-    // EXPORT LAPORAN EXCEL & PDF RAPI
     function exportToExcel() {
       const dataToExport = rawKasItems.map(i => ({
         ID: i.id,
@@ -911,14 +1165,15 @@
         Tipe: i.tipe,
         Jumlah: i.jumlah,
         Keterangan: i.keterangan,
-        Dompet: i.dompet || 'Utama'
+        Dompet: i.dompet || 'Utama',
+        Kategori: i.kategori || 'Umum'
       }));
       const ws = XLSX.utils.json_to_sheet(dataToExport);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Data Kas");
       XLSX.writeFile(wb, "Laporan_Uang_Kas_Digital.xlsx");
-      logActivity('Export Laporan', 'Mengeksport data kas ke format Excel');
-      showToast('Laporan Excel berhasil diunduh', 'success');
+      logActivity('Export Laporan', 'Export data kas ke Excel');
+      showToast('Laporan Excel diunduh', 'success');
     }
 
     function exportToPDF() {
@@ -942,24 +1197,65 @@
       });
 
       doc.save("Laporan_Uang_Kas_Digital.pdf");
-      logActivity('Export Laporan', 'Mengeksport data kas ke format PDF');
-      showToast('Laporan PDF berhasil diunduh', 'success');
+      logActivity('Export Laporan', 'Export data kas ke PDF');
+      showToast('Laporan PDF diunduh', 'success');
     }
 
-    // ANALYTICS CHART MODAL
+    // ANALYTICS & CHART.JS
     function openAnalyticsModal() {
       openModal('modalAnalytics');
+      renderAnalyticsChart();
+    }
+
+    function renderAnalyticsChart() {
+      const dim = document.getElementById('chartDimensionSelect').value;
+      const type = document.getElementById('chartTypeSelect').value;
       const ctx = document.getElementById('kasChart').getContext('2d');
-      let masuk = 0, keluar = 0;
-      rawKasItems.forEach(i => {
-        if (i.tipe === 'MASUK' || i.tipe === 'Pemasukan') masuk += Number(i.jumlah || 0);
-        else keluar += Number(i.jumlah || 0);
-      });
-      new Chart(ctx, {
-        type: 'doughnut',
+
+      if (mainKasChartInstance) mainKasChartInstance.destroy();
+
+      let labels = [];
+      let data = [];
+      let mapData = {};
+
+      if (dim === 'dompet') {
+        rawKasItems.forEach(i => {
+          let d = i.dompet || 'Utama';
+          let val = Number(i.jumlah || 0);
+          mapData[d] = (mapData[d] || 0) + val;
+        });
+      } else if (dim === 'kategori') {
+        rawKasItems.forEach(i => {
+          let k = i.kategori || 'Umum';
+          let val = Number(i.jumlah || 0);
+          mapData[k] = (mapData[k] || 0) + val;
+        });
+      } else {
+        let masuk = 0, keluar = 0;
+        rawKasItems.forEach(i => {
+          let t = i.tipe || i.Type;
+          let val = Number(i.jumlah || 0);
+          if (t === 'MASUK' || t === 'Pemasukan') masuk += val; else keluar += val;
+        });
+        mapData = { 'Pemasukan': masuk, 'Pengeluaran': keluar };
+      }
+
+      labels = Object.keys(mapData);
+      data = Object.values(mapData);
+
+      mainKasChartInstance = new Chart(ctx, {
+        type: type,
         data: {
-          labels: ['Pemasukan', 'Pengeluaran'],
-          datasets: [{ data: [masuk, keluar], backgroundColor: ['#10b981', '#ef4444'] }]
+          labels: labels,
+          datasets: [{
+            label: 'Nominal (Rp)',
+            data: data,
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: true, position: 'bottom' } }
         }
       });
     }
