@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Uang Kas Digital</title>
+  
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/781/781760.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overscroll-behavior-y: none;
+    }
+    ::-webkit-scrollbar { display: none; }
+    .tab-content { will-change: transform, opacity; }
+    .modal {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal.active > div { transform: translateY(0); }
+    .modal > div {
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast-item { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pb-24 select-none antialiased overflow-x-hidden">
+
+  <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-11/12 max-w-sm pointer-events-none"></div>
+
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-500 flex items-center justify-center font-bold text-lg">
+          <i class="ph ph-wallet"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold leading-tight">Uang Kas Digital</h1>
+          <p id="userStatus" class="text-[10px] text-gray-500 dark:text-gray-400">Mode: Fetch API Murni</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <i id="themeIcon" class="ph ph-moon text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 pt-4">
+    
+    <div id="tab-kas" class="tab-content">
+      <div class="bg-gradient-to-br from-brand-600 to-brand-700 text-white rounded-3xl p-5 shadow-lg shadow-brand-500/20 mb-4 relative overflow-hidden">
+        <div class="relative z-10">
+          <span class="text-xs text-brand-50/80 font-medium">Total Saldo Kas</span>
+          <h2 id="totalSaldo" class="text-2xl font-black mt-1 tracking-tight">Rp 0</h2>
+          
+          <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/10">
+            <div>
+              <span class="text-[10px] text-brand-50/70 block">Pemasukan</span>
+              <p id="totalMasuk" class="text-xs font-bold text-emerald-300 mt-0.5">Rp 0</p>
+            </div>
+            <div>
+              <span class="text-[10px] text-brand-50/70 block">Pengeluaran</span>
+              <p id="totalKeluar" class="text-xs font-bold text-rose-300 mt-0.5">Rp 0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button onclick="openModal('modalInputKas')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
+          <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1">
+            <i class="ph ph-plus text-base"></i>
+          </div>
+          <span class="text-[11px] font-semibold">Transaksi Kas</span>
+        </button>
+
+        <button onclick="loadKasData()" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
+          <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
+            <i class="ph ph-arrows-clockwise text-base"></i>
+          </div>
+          <span class="text-[11px] font-semibold">Refresh Data</span>
+        </button>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Riwayat Transaksi</h3>
+        </div>
+        <div id="kasListContainer" class="space-y-2 max-h-[380px] overflow-y-auto">
+          <p class="text-xs text-center py-6 text-gray-400">Memuat riwayat transaksi...</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-hutang" class="tab-content hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold">Hutang & Piutang</h2>
+        <button onclick="openModal('modalInputHutang')" class="text-xs bg-brand-600 text-white px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1">
+          <i class="ph ph-plus"></i> Catat Baru
+        </button>
+      </div>
+      <div id="hutangListContainer" class="space-y-2">
+        <p class="text-xs text-center py-6 text-gray-400">Memuat data hutang...</p>
+      </div>
+    </div>
+
+    <div id="tab-sokongan" class="tab-content hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold">Data Sokongan / Donasi</h2>
+        <button onclick="openModal('modalInputSokongan')" class="text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1">
+          <i class="ph ph-plus"></i> Tambah Donasi
+        </button>
+      </div>
+      <div id="sokonganListContainer" class="space-y-2">
+        <p class="text-xs text-center py-6 text-gray-400">Memuat data sokongan...</p>
+      </div>
+    </div>
+
+    <div id="tab-settings" class="tab-content hidden space-y-4">
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
+        <div id="dompetMasterList" class="space-y-2 mb-3"></div>
+        <button onclick="openModal('modalInputDompet')" class="w-full py-2 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
+          + Tambah Dompet Baru
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40">
+    <div class="max-w-md mx-auto grid grid-cols-4 py-2">
+      <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-brand-600 dark:text-brand-400">
+        <i class="ph ph-receipt text-xl"></i>
+        <span class="text-[10px] font-semibold mt-0.5">Kas</span>
+      </button>
+      <button onclick="switchTab('hutang')" id="nav-hutang" class="flex flex-col items-center justify-center text-gray-400">
+        <i class="ph ph-hand-coins text-xl"></i>
+        <span class="text-[10px] font-semibold mt-0.5">Hutang</span>
+      </button>
+      <button onclick="switchTab('sokongan')" id="nav-sokongan" class="flex flex-col items-center justify-center text-gray-400">
+        <i class="ph ph-heart text-xl"></i>
+        <span class="text-[10px] font-semibold mt-0.5">Sokongan</span>
+      </button>
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center justify-center text-gray-400">
+        <i class="ph ph-gear text-xl"></i>
+        <span class="text-[10px] font-semibold mt-0.5">Pengaturan</span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="modalInputKas" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Tambah Transaksi Kas</h3>
+        <button onclick="closeModal('modalInputKas')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitAddKas(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Tipe Transaksi</label>
+          <select id="kasTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            <option value="MASUK">Pemasukan (+)</option>
+            <option value="KELUAR">Pengeluaran (-)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
+          <input type="number" id="kasJumlah" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Keterangan</label>
+          <input type="text" id="kasKet" required placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" id="btnSubmitKas" class="w-full py-3 bg-brand-600 text-white rounded-xl text-xs font-bold">Simpan Transaksi</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT KAMU DI SINI:
+    const GAS_API_URL = "https://script.google.com/macros/s/PASTE_URL_WEB_APP_DI_SINI/exec";
+    // =========================================================================
+
+    function callGAS(actionName, payloadData, onSuccess, onError) {
+      const bodyData = { action: actionName, ...payloadData };
+
+      fetch(GAS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(bodyData)
+      })
+      .then(res => res.json())
+      .then(res => { if (onSuccess) onSuccess(res); })
+      .catch(err => {
+        if (onError) onError(err);
+        else showToast("Gagal terhubung ke API Server", "error");
+      });
+    }
+
+    let rawKasItems = [];
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-gray-800');
+      toast.className = `toast-item ${bg} text-white px-4 py-2.5 rounded-2xl text-xs font-semibold shadow-lg pointer-events-auto flex items-center justify-between`;
+      toast.innerHTML = `<span>${msg}</span><i class="ph ph-x text-sm cursor-pointer ml-2" onclick="this.parentElement.remove()"></i>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function switchTab(tabName) {
+      const tabs = ['kas', 'hutang', 'sokongan', 'settings'];
+      tabs.forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (t === tabName) {
+          el.classList.remove('hidden');
+          nav.className = "flex flex-col items-center justify-center text-brand-600 dark:text-brand-400";
+        } else {
+          el.classList.add('hidden');
+          nav.className = "flex flex-col items-center justify-center text-gray-400";
+        }
+      });
+    }
+
+    function loadKasData() {
+      const container = document.getElementById('kasListContainer');
+      container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Memuat data...</p>`;
+      
+      callGAS('getKasData', {}, function(res) {
+        if (res.status === 'success') {
+          rawKasItems = res.data || [];
+          renderKasList();
+        } else {
+          showToast(res.message || 'Gagal memuat data', 'error');
+        }
+      });
+    }
+
+    function renderKasList() {
+      const container = document.getElementById('kasListContainer');
+      let totalSaldo = 0, totalMasuk = 0, totalKeluar = 0;
+
+      if (!rawKasItems.length) {
+        container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada data transaksi.</p>`;
+      } else {
+        container.innerHTML = rawKasItems.map(item => {
+          const isMasuk = item.tipe === 'MASUK';
+          const val = Number(item.jumlah || 0);
+          if (isMasuk) totalMasuk += val; else totalKeluar += val;
+
+          return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+              <div>
+                <p class="text-xs font-bold">${item.keterangan || 'Transaksi'}</p>
+                <span class="text-[10px] text-gray-400">${item.date ? new Date(item.date).toLocaleDateString('id-ID') : ''}</span>
+              </div>
+              <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
+                ${isMasuk ? '+' : '-'} Rp ${val.toLocaleString('id-ID')}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      totalSaldo = totalMasuk - totalKeluar;
+      document.getElementById('totalSaldo').innerText = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
+      document.getElementById('totalMasuk').innerText = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+      document.getElementById('totalKeluar').innerText = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
+    }
+
+    function submitAddKas(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitKas');
+      btn.innerText = 'Menyimpan...';
+      btn.disabled = true;
+
+      const tipe = document.getElementById('kasTipe').value;
+      const jumlah = document.getElementById('kasJumlah').value;
+      const ket = document.getElementById('kasKet').value;
+
+      callGAS('addKas', { tipe: tipe, jumlah: jumlah, keterangan: ket }, function(res) {
+        btn.innerText = 'Simpan Transaksi';
+        btn.disabled = false;
+        
+        if (res.status === 'success') {
+          showToast('Transaksi berhasil disimpan!', 'success');
+          closeModal('modalInputKas');
+          document.getElementById('kasJumlah').value = '';
+          document.getElementById('kasKet').value = '';
+          loadKasData();
+        } else {
+          showToast(res.message || 'Gagal menyimpan', 'error');
+        }
+      }, function() {
+        btn.innerText = 'Simpan Transaksi';
+        btn.disabled = false;
+        showToast('Koneksi terputus', 'error');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadKasData();
+    });
+  </script>
+</body>
+</html>
