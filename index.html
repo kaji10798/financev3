@@ -137,7 +137,7 @@
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button onclick="closeConfirmModal(false)" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-semibold hover:bg-gray-200">Batal</button>
-        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Hapus</button>
+        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
@@ -146,13 +146,7 @@
     <div class="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700">
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 mb-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 9.5L17.2 3.8C19.2 3 21 4.3 21 6.3V9" />
-            <path d="M6 10L17.5 5" />
-            <rect x="2" y="9" width="20" height="12" rx="3" />
-            <path d="M22 12h-4.5a3 3 0 0 0 0 6H22" />
-            <circle cx="17.5" cy="15" r="0.8" fill="currentColor" stroke="none" />
-          </svg>
+          <i class="ph ph-wallet-bold text-3xl"></i>
         </div>
         <h1 class="text-xl font-bold">Uang Kas Digital</h1>
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Masuk untuk mengelola keuangan</p>
@@ -208,6 +202,13 @@
           <div class="relative z-10">
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs text-blue-100/80 font-medium">Total Saldo Kas</span>
+              <div class="relative">
+                <button onclick="toggleDropdown('dompetMenuOptions')" class="flex items-center gap-1 text-[11px] bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/20 transition">
+                  <span id="selectedDompetLabel" class="truncate max-w-[80px]">Semua Dompet</span>
+                  <i class="ph ph-caret-down"></i>
+                </button>
+                <div id="dompetMenuOptions" class="hidden absolute right-0 top-full mt-1.5 w-40 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl py-1 z-50 text-xs max-h-48 overflow-y-auto"></div>
+              </div>
             </div>
             <h2 id="totalSaldo" class="text-2xl font-black tracking-tight">Rp 0</h2>
             <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/10">
@@ -223,18 +224,24 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="grid grid-cols-3 gap-2 mb-4">
           <button onclick="openModal('modalInputKas')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
             <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1">
               <i class="ph ph-plus text-base"></i>
             </div>
             <span class="text-[11px] font-semibold">Transaksi</span>
           </button>
-          <button onclick="loadKasData()" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
+          <button onclick="openModal('modalTransfer')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
             <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
-              <i class="ph ph-arrows-clockwise text-base"></i>
+              <i class="ph ph-arrows-left-right text-base"></i>
             </div>
-            <span class="text-[11px] font-semibold">Refresh</span>
+            <span class="text-[11px] font-semibold">Transfer</span>
+          </button>
+          <button onclick="openAnalyticsModal()" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
+            <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-1">
+              <i class="ph ph-chart-pie text-base"></i>
+            </div>
+            <span class="text-[11px] font-semibold">Analisis</span>
           </button>
         </div>
 
@@ -281,6 +288,14 @@
             + Tambah Dompet Baru
           </button>
         </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Kategori Transaksi</h3>
+          <div id="categoryMasterList" class="space-y-2 mb-3"></div>
+          <button onclick="openModal('modalInputCategory')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
+            + Tambah Kategori Baru
+          </button>
+        </div>
       </div>
     </main>
 
@@ -321,6 +336,14 @@
           </select>
         </div>
         <div>
+          <label class="text-[10px] font-semibold">Pilih Dompet</label>
+          <select id="kasDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Pilih Kategori</label>
+          <select id="kasCategorySelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="kasJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
@@ -329,6 +352,85 @@
           <input type="text" id="kasKet" required placeholder="Deskripsi transaksi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
         <button type="submit" id="btnSubmitKas" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Transaksi</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Transfer Antar Dompet</h3>
+        <button onclick="closeModal('modalTransfer')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitTransfer(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Dari Dompet</label>
+          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Ke Dompet</label>
+          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
+          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Proses Transfer</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Analisis Grafik Keuangan</h3>
+        <button onclick="closeModal('modalAnalytics')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] font-semibold block mb-1">Dimensi</label>
+          <select id="chartDimensionSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            <option value="dompet">Per Dompet</option>
+            <option value="kategori">Per Kategori</option>
+            <option value="flow">Cashflow (Masuk/Keluar)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold block mb-1">Tipe Grafik</label>
+          <select id="chartTypeSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            <option value="doughnut">Donut / Lingkaran</option>
+            <option value="bar">Diagram Batang</option>
+            <option value="line">Garis Trend</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border dark:border-gray-700">
+        <canvas id="kasChart" class="w-full max-h-56"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalPayHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm" id="payHutangTitle">Bayar Cicilan Hutang</h3>
+        <button onclick="closeModal('modalPayHutang')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitPayHutang(event)" class="space-y-3">
+        <input type="hidden" id="payHutangId">
+        <div>
+          <label class="text-[10px] font-semibold">Sumber/Tujuan Dompet</label>
+          <select id="cclDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Jumlah Pembayaran (Rp)</label>
+          <input type="text" id="payHutangAmount" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <div>
+          <label class="text-[10px] font-semibold">Keterangan Cicilan</label>
+          <input type="text" id="payHutangKet" placeholder="Cicilan ke-..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Pembayaran</button>
       </form>
     </div>
   </div>
@@ -345,6 +447,22 @@
           <input type="text" id="newDompetName" required placeholder="Contoh: Rekening BCA" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
         <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Dompet</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalInputCategory" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+        <h3 class="font-bold text-sm">Tambah Kategori Baru</h3>
+        <button onclick="closeModal('modalInputCategory')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
+      </div>
+      <form onsubmit="submitAddCategory(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-semibold">Nama Kategori</label>
+          <input type="text" id="newCategoryName" required placeholder="Contoh: Hiburan, Tagihan" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Kategori</button>
       </form>
     </div>
   </div>
@@ -415,8 +533,11 @@
     let currentUser = null;
     let rawKasItems = [];
     let walletList = [];
+    let categoryList = JSON.parse(localStorage.getItem('app_categories') || '["Umum", "Makanan", "Belanja", "Transportasi", "Operasional", "Transfer"]');
     let isBalanceVisible = localStorage.getItem('balance_visible') !== 'false';
+    let selectedFilterWallet = 'ALL';
     let pendingConfirmCallback = null;
+    let mainKasChartInstance = null;
 
     function formatNumberInput(element) {
       if (!element) return;
@@ -535,6 +656,7 @@
       loadKasData();
       loadHutangData();
       loadSokonganData();
+      renderCategoryMaster();
     }
 
     function switchTab(tabName) {
@@ -558,6 +680,7 @@
           walletList = res.wallets || ["Utama"];
           renderKasList();
           populateDompetDropdowns();
+          populateCategoryDropdowns();
         }
       }).processClientRequest({ action: 'getKasData' });
     }
@@ -579,7 +702,7 @@
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
               <div>
                 <p class="text-xs font-bold">${item.keterangan || item.Description || 'Transaksi'}</p>
-                <span class="text-[10px] text-gray-400">${item.dompet || item.Dompet} • ${item.date || item.Date ? new Date(item.date || item.Date).toLocaleDateString('id-ID') : ''}</span>
+                <span class="text-[10px] text-gray-400">${item.dompet || item.Dompet} • ${item.kategori || item.Category || 'Umum'}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
@@ -600,7 +723,18 @@
     }
 
     function populateDompetDropdowns() {
+      const trfFrom = document.getElementById('trfFrom');
+      const trfTo = document.getElementById('trfTo');
+      const kasDompetSelect = document.getElementById('kasDompetSelect');
+      const cclDompetSelect = document.getElementById('cclDompetSelect');
       const masterList = document.getElementById('dompetMasterList');
+
+      const optionsHtml = walletList.map(w => `<option value="${w}">${w}</option>`).join('');
+      if (trfFrom) trfFrom.innerHTML = optionsHtml;
+      if (trfTo) trfTo.innerHTML = optionsHtml;
+      if (kasDompetSelect) kasDompetSelect.innerHTML = optionsHtml;
+      if (cclDompetSelect) cclDompetSelect.innerHTML = optionsHtml;
+
       if (masterList) {
         masterList.innerHTML = walletList.map(w => `
           <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
@@ -611,9 +745,54 @@
       }
     }
 
+    function populateCategoryDropdowns() {
+      const sel = document.getElementById('kasCategorySelect');
+      if (sel) {
+        sel.innerHTML = categoryList.map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+      renderCategoryMaster();
+    }
+
+    function renderCategoryMaster() {
+      const masterList = document.getElementById('categoryMasterList');
+      if (masterList) {
+        masterList.innerHTML = categoryList.map(c => `
+          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
+            <span>${c}</span>
+            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function submitAddCategory(e) {
+      e.preventDefault();
+      const input = document.getElementById('newCategoryName');
+      const val = input.value.trim();
+      if (val && !categoryList.includes(val)) {
+        categoryList.push(val);
+        localStorage.setItem('app_categories', JSON.stringify(categoryList));
+        populateCategoryDropdowns();
+        closeModal('modalInputCategory');
+        input.value = '';
+        showToast(`Kategori "${val}" ditambahkan`, 'success');
+      }
+    }
+
+    function deleteCategory(name) {
+      showConfirm('Hapus Kategori', `Hapus kategori "${name}"?`, () => {
+        categoryList = categoryList.filter(c => c !== name);
+        localStorage.setItem('app_categories', JSON.stringify(categoryList));
+        populateCategoryDropdowns();
+        showToast(`Kategori "${name}" dihapus`, 'success');
+      });
+    }
+
     function submitAddKas(e) {
       e.preventDefault();
       const tipe = document.getElementById('kasTipe').value;
+      const dompet = document.getElementById('kasDompetSelect').value;
+      const kategori = document.getElementById('kasCategorySelect').value;
       const jumlah = getUnformattedNumber('kasJumlah');
       const ket = document.getElementById('kasKet').value;
 
@@ -627,7 +806,7 @@
         } else {
           showToast(res.message, 'error');
         }
-      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket });
+      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket, dompet: dompet, kategori: kategori });
     }
 
     function deleteKas(id) {
@@ -639,6 +818,24 @@
           }
         }).processClientRequest({ action: 'deleteKas', id: id });
       });
+    }
+
+    function submitTransfer(e) {
+      e.preventDefault();
+      const from = document.getElementById('trfFrom').value;
+      const to = document.getElementById('trfTo').value;
+      const val = getUnformattedNumber('trfJumlah');
+
+      if (from === to) { showToast('Dompet asal dan tujuan tidak boleh sama', 'error'); return; }
+
+      google.script.run.withSuccessHandler(res => {
+        if (res.status === 'success') {
+          showToast('Transfer berhasil diselesaikan', 'success');
+          closeModal('modalTransfer');
+          document.getElementById('trfJumlah').value = '';
+          loadKasData();
+        }
+      }).processClientRequest({ action: 'transferSaldo', from: from, to: to, jumlah: val });
     }
 
     function submitAddDompet(e) {
@@ -682,11 +879,40 @@
                 <p class="text-xs font-bold">${h.nama || h.Nama}</p>
                 <p class="text-[10px] text-gray-400">Sisa: Rp ${Number(h.sisa || h.Sisa).toLocaleString('id-ID')} / Rp ${Number(h.jumlah || h.Jumlah).toLocaleString('id-ID')}</p>
               </div>
-              <span class="text-[10px] font-bold px-2 py-1 rounded-full ${h.status === 'LUNAS' || h.Status === 'LUNAS' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${h.status || h.Status}</span>
+              <div class="flex items-center gap-2">
+                ${(h.status || h.Status) !== 'LUNAS' ? `<button onclick="openPayHutangModal('${h.id || h.ID}', '${h.nama || h.Nama}')" class="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-xl font-bold">Bayar</button>` : '<span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-600">LUNAS</span>'}
+              </div>
             </div>
           `).join('');
         }
       }).processClientRequest({ action: 'getHutangData' });
+    }
+
+    function openPayHutangModal(id, nama) {
+      document.getElementById('payHutangId').value = id;
+      document.getElementById('payHutangTitle').innerText = `Bayar Cicilan (${nama})`;
+      populateDompetDropdowns();
+      openModal('modalPayHutang');
+    }
+
+    function submitPayHutang(e) {
+      e.preventDefault();
+      const id = document.getElementById('payHutangId').value;
+      const amount = getUnformattedNumber('payHutangAmount');
+      const dompet = document.getElementById('cclDompetSelect').value;
+      const ket = document.getElementById('payHutangKet').value;
+
+      google.script.run.withSuccessHandler(res => {
+        if (res.status === 'success') {
+          showToast('Cicilan berhasil dibayarkan!', 'success');
+          closeModal('modalPayHutang');
+          document.getElementById('payHutangAmount').value = '';
+          loadHutangData();
+          loadKasData();
+        } else {
+          showToast(res.message, 'error');
+        }
+      }).processClientRequest({ action: 'payHutang', id: id, amount: amount, dompet: dompet, keterangan: ket });
     }
 
     function submitAddHutang(e) {
@@ -741,6 +967,65 @@
         }
       }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
     }
+
+    // ANALYTICS & CHART JS (DIKEMBALIKAN KODE SEPENUHNYA)
+    function openAnalyticsModal() {
+      openModal('modalAnalytics');
+      renderAnalyticsChart();
+    }
+
+    function renderAnalyticsChart() {
+      const dim = document.getElementById('chartDimensionSelect').value;
+      const type = document.getElementById('chartTypeSelect').value;
+      const ctx = document.getElementById('kasChart').getContext('2d');
+
+      if (mainKasChartInstance) mainKasChartInstance.destroy();
+
+      let labels = [];
+      let data = [];
+      let mapData = {};
+
+      if (dim === 'dompet') {
+        rawKasItems.forEach(i => {
+          let d = i.dompet || i.Dompet || 'Utama';
+          let val = Number(i.jumlah || i.Amount || 0);
+          mapData[d] = (mapData[d] || 0) + val;
+        });
+      } else if (dim === 'kategori') {
+        rawKasItems.forEach(i => {
+          let k = i.kategori || i.Category || 'Umum';
+          let val = Number(i.jumlah || i.Amount || 0);
+          mapData[k] = (mapData[k] || 0) + val;
+        });
+      } else {
+        let masuk = 0, keluar = 0;
+        rawKasItems.forEach(i => {
+          let t = i.tipe || i.Type;
+          let val = Number(i.jumlah || i.Amount || 0);
+          if (t === 'MASUK' || t === 'Pemasukan') masuk += val; else keluar += val;
+        });
+        mapData = { 'Pemasukan': masuk, 'Pengeluaran': keluar };
+      }
+
+      labels = Object.keys(mapData);
+      data = Object.values(mapData);
+
+      mainKasChartInstance = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Nominal (Rp)',
+            data: data,
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: true, position: 'bottom' } }
+        }
+      });
+    }
   </script>
 </body>
-</html>
+</html>S
