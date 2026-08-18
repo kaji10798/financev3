@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Uang Kas Digital</title>
 
+  <!-- FAVICON FLATICON -->
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/781/781760.png">
 
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -25,9 +27,12 @@
       }
     }
   </script>
+  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- EMBEDDED STYLESHEET.HTML -->
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
@@ -87,11 +92,9 @@
     }
   </style>
 
+  <!-- ADAPTER BRIDGE DENGAN LINK APPS SCRIPT LENGKAP -->
   <script>
-    // =========================================================================
-    // PASTE-KAN URL WEB APP DEPLOY DARI GOOGLE APPS SCRIPT KAMU DI SINI:
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby0DQ130inwA5uzOliyDH2MxJVyIN8iKyG7LrMfopqmgZVd44U4Zq9-O0PIi10Zionr/exec";
-    // =========================================================================
 
     const google = {
       script: {
@@ -127,8 +130,10 @@
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pb-24 select-none antialiased overflow-x-hidden">
 
+  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs px-4 pointer-events-none"></div>
 
+  <!-- MODAL KONFIRMASI -->
   <div id="modalConfirm" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-2xl p-5 text-center space-y-4 shadow-2xl border border-gray-100 dark:border-gray-700">
       <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto text-2xl">
@@ -145,6 +150,7 @@
     </div>
   </div>
 
+  <!-- LOGIN SECTION (DILENGKAPI AUTOCOMPLETE ATTRIBUTES) -->
   <div id="loginView" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm">
     <div class="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700">
       <div class="text-center mb-6">
@@ -163,12 +169,12 @@
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label class="text-xs font-semibold mb-1 block">Username</label>
-          <input type="text" id="loginUsername" required class="w-full px-4 py-3 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="loginUsername" autocomplete="username" required class="w-full px-4 py-3 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
           <label class="text-xs font-semibold mb-1 block">Password</label>
           <div class="relative">
-            <input type="password" id="loginPassword" required class="w-full px-4 py-3 pr-10 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="password" id="loginPassword" autocomplete="current-password" required class="w-full px-4 py-3 pr-10 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               <i id="passwordEyeIcon" class="ph ph-eye text-lg"></i>
             </button>
@@ -179,6 +185,7 @@
     </div>
   </div>
 
+  <!-- MAIN APP SECTION -->
   <div id="appView" class="hidden">
     <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors">
       <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
@@ -206,6 +213,7 @@
     </header>
 
     <main class="max-w-md mx-auto px-4 pt-4">
+      <!-- TAB KAS -->
       <div id="tab-kas" class="tab-content">
         <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-blue-500/20 mb-4 relative overflow-hidden">
           <div class="relative z-10">
@@ -265,6 +273,7 @@
         </div>
       </div>
 
+      <!-- TAB HUTANG -->
       <div id="tab-hutang" class="tab-content hidden">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-sm font-bold">Hutang & Piutang</h2>
@@ -277,6 +286,7 @@
         </div>
       </div>
 
+      <!-- TAB SOKONGAN -->
       <div id="tab-sokongan" class="tab-content hidden">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-sm font-bold">Data Sokongan / Donasi</h2>
@@ -289,6 +299,7 @@
         </div>
       </div>
 
+      <!-- TAB SETTINGS -->
       <div id="tab-settings" class="tab-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
           <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
@@ -305,6 +316,7 @@
       </div>
     </main>
 
+    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40">
       <div class="max-w-md mx-auto grid grid-cols-4 py-2">
         <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400">
@@ -327,6 +339,7 @@
     </nav>
   </div>
 
+  <!-- MODAL INPUT KAS -->
   <div id="modalInputKas" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -354,6 +367,7 @@
     </div>
   </div>
 
+  <!-- MODAL TRANSFER -->
   <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -378,6 +392,7 @@
     </div>
   </div>
 
+  <!-- MODAL ANALYTICS -->
   <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -390,6 +405,7 @@
     </div>
   </div>
 
+  <!-- MODAL MASTER DOMPET -->
   <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -406,6 +422,7 @@
     </div>
   </div>
 
+  <!-- MODAL INPUT HUTANG -->
   <div id="modalInputHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -437,6 +454,7 @@
     </div>
   </div>
 
+  <!-- MODAL INPUT SOKONGAN -->
   <div id="modalInputSokongan" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
@@ -468,6 +486,7 @@
     </div>
   </div>
 
+  <!-- EMBEDDED JAVASCRIPT LOGIC -->
   <script>
     let currentUser = null;
     let rawKasItems = [];
@@ -550,7 +569,7 @@
       modal.classList.remove('opacity-0', 'pointer-events-none');
       document.getElementById('btnConfirmAction').onclick = function() {
         if (pendingConfirmCallback) pendingConfirmCallback();
-        closeConfirmModal(true);
+        closeConfirmModal();
       };
     }
 
@@ -627,7 +646,8 @@
       let totalSaldo = 0, totalMasuk = 0, totalKeluar = 0;
 
       let filtered = rawKasItems.filter(item => {
-        if (selectedFilterWallet !== 'ALL' && item.dompet !== selectedFilterWallet) return false;
+        const itemDompet = item.dompet || item.Dompet;
+        if (selectedFilterWallet !== 'ALL' && itemDompet !== selectedFilterWallet) return false;
         return true;
       });
 
@@ -635,21 +655,22 @@
         container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada transaksi.</p>`;
       } else {
         container.innerHTML = filtered.map(item => {
-          const isMasuk = item.tipe === 'MASUK';
-          const val = Number(item.jumlah || 0);
+          const tipe = item.tipe || item.Type;
+          const isMasuk = tipe === 'MASUK' || tipe === 'Pemasukan';
+          const val = Number(item.jumlah || item.Amount || 0);
           if (isMasuk) totalMasuk += val; else totalKeluar += val;
 
           return `
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
               <div>
-                <p class="text-xs font-bold">${item.keterangan || 'Transaksi'}</p>
-                <span class="text-[10px] text-gray-400">${item.dompet} • ${item.date ? new Date(item.date).toLocaleDateString('id-ID') : ''}</span>
+                <p class="text-xs font-bold">${item.keterangan || item.Description || 'Transaksi'}</p>
+                <span class="text-[10px] text-gray-400">${item.dompet || item.Dompet} • ${item.date || item.Date ? new Date(item.date || item.Date).toLocaleDateString('id-ID') : ''}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
                   ${isBalanceVisible ? (isMasuk ? '+' : '-') + ' Rp ' + val.toLocaleString('id-ID') : '••••••••'}
                 </span>
-                <button onclick="deleteKas('${item.id}')" class="text-gray-400 hover:text-rose-500 text-sm"><i class="ph ph-trash"></i></button>
+                <button onclick="deleteKas('${item.id || item.ID}')" class="text-gray-400 hover:text-rose-500 text-sm"><i class="ph ph-trash"></i></button>
               </div>
             </div>
           `;
@@ -765,11 +786,11 @@
           container.innerHTML = res.data.map(h => `
             <div class="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center">
               <div>
-                <span class="text-[9px] font-bold uppercase tracking-wider ${h.tipe === 'Hutang' ? 'text-rose-500' : 'text-blue-500'}">${h.tipe}</span>
-                <p class="text-xs font-bold">${h.nama}</p>
-                <p class="text-[10px] text-gray-400">Sisa: Rp ${Number(h.sisa).toLocaleString('id-ID')} / Rp ${Number(h.jumlah).toLocaleString('id-ID')}</p>
+                <span class="text-[9px] font-bold uppercase tracking-wider ${h.tipe === 'Hutang' || h.Tipe === 'Hutang' ? 'text-rose-500' : 'text-blue-500'}">${h.tipe || h.Tipe}</span>
+                <p class="text-xs font-bold">${h.nama || h.Nama}</p>
+                <p class="text-[10px] text-gray-400">Sisa: Rp ${Number(h.sisa || h.Sisa).toLocaleString('id-ID')} / Rp ${Number(h.jumlah || h.Jumlah).toLocaleString('id-ID')}</p>
               </div>
-              <span class="text-[10px] font-bold px-2 py-1 rounded-full ${h.status === 'LUNAS' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${h.status}</span>
+              <span class="text-[10px] font-bold px-2 py-1 rounded-full ${h.status === 'LUNAS' || h.Status === 'LUNAS' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${h.status || h.Status}</span>
             </div>
           `).join('');
         }
@@ -803,10 +824,10 @@
           container.innerHTML = res.data.map(s => `
             <div class="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center">
               <div>
-                <p class="text-xs font-bold">${s.nama}</p>
-                <span class="text-[10px] text-gray-400">${s.keterangan || 'Donasi'}</span>
+                <p class="text-xs font-bold">${s.nama || s.Nama}</p>
+                <span class="text-[10px] text-gray-400">${s.keterangan || s.Keterangan || 'Donasi'}</span>
               </div>
-              <span class="text-xs font-bold text-emerald-500">+ Rp ${Number(s.jumlah).toLocaleString('id-ID')}</span>
+              <span class="text-xs font-bold text-emerald-500">+ Rp ${Number(s.jumlah || s.Jumlah).toLocaleString('id-ID')}</span>
             </div>
           `).join('');
         }
