@@ -388,7 +388,7 @@
 
     <nav class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-md glass-nav rounded-full px-2 py-2 shadow-xl">
       <div class="grid grid-cols-5 items-center">
-        <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400">
+        <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
           <i class="ph ph-receipt text-lg"></i>
           <span class="text-[9px] font-semibold mt-0.5">Kas</span>
         </button>
@@ -396,7 +396,7 @@
           <i class="ph ph-hand-coins text-lg"></i>
           <span class="text-[9px] font-semibold mt-0.5">Hutang</span>
         </button>
-        
+
         <div class="flex items-center justify-center">
           <button onclick="openModal('modalInputKas')" class="w-11 h-11 -mt-5 bg-gradient-to-tr from-blue-600 to-indigo-600 hover:scale-105 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/40 active:scale-95 transition">
             <i class="ph ph-plus-bold text-xl"></i>
@@ -734,21 +734,26 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    // PENANGANAN MODAL CONFIRMASI HAPUS YANG BENAR & SAFE
     function showConfirm(title, message, callback) {
       document.getElementById('confirmTitle').innerText = title;
       document.getElementById('confirmMessage').innerText = message;
       pendingConfirmCallback = callback;
       const modal = document.getElementById('modalConfirm');
-      modal.classList.remove('opacity-0', 'pointer-events-none');
-      document.getElementById('btnConfirmAction').onclick = function() {
-        if (pendingConfirmCallback) pendingConfirmCallback();
+      modal.classList.add('active');
+      
+      const btn = document.getElementById('btnConfirmAction');
+      btn.onclick = function() {
+        if (pendingConfirmCallback) {
+          pendingConfirmCallback();
+        }
         closeConfirmModal();
       };
     }
 
     function closeConfirmModal() {
       const modal = document.getElementById('modalConfirm');
-      modal.classList.add('opacity-0', 'pointer-events-none');
+      modal.classList.remove('active');
       pendingConfirmCallback = null;
     }
 
@@ -837,7 +842,6 @@
       if (tabName === 'settings') renderActivityLogs();
     }
 
-    // ACCORDION SETTINGS MENU EXPAND/COLLAPSE TOGGLE
     function toggleSettingsAccordion(id) {
       const content = document.getElementById(id);
       const icon = document.getElementById(`setAccIcon-${id}`);
@@ -852,7 +856,7 @@
       }
     }
 
-    // KAS & DOMPET LOGIC
+    // KAS & DOMPET LOGIC (RE-FIXED DELETE EVENT)
     function renderKasList() {
       const container = document.getElementById('kasListContainer');
       let totalSaldo = 0, totalMasuk = 0, totalKeluar = 0;
@@ -870,13 +874,13 @@
             <div class="flex items-center justify-between p-3 bg-white/40 dark:bg-gray-800/40 rounded-2xl border border-gray-200/40 dark:border-gray-700/40">
               <div>
                 <p class="text-xs font-bold">${item.keterangan || 'Transaksi'}</p>
-                <span class="text-[10px] text-gray-400">${item.dompet || 'Utama'} • ${item.kategori || 'Umum'}</span>
+                <span class="text-[10px] text-gray-400">${item.dompet \vert{}\vert{} 'Utama'} •${item.kategori || 'Umum'}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
                   ${isBalanceVisible ? (isMasuk ? '+' : '-') + ' Rp ' + val.toLocaleString('id-ID') : '••••••••'}
                 </span>
-                <button onclick="deleteKas('${item.id}')" class="text-gray-400 hover:text-rose-500 text-sm p-1"><i class="ph ph-trash"></i></button>
+                <button onclick="deleteKas('${item.id}')" class="text-gray-400 hover:text-rose-500 text-sm p-1 transition"><i class="ph ph-trash"></i></button>
               </div>
             </div>
           `;
@@ -907,7 +911,7 @@
         masterList.innerHTML = walletList.map(w => `
           <div class="flex justify-between items-center p-2.5 bg-white/40 dark:bg-gray-800/40 rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-xs font-semibold">
             <span>${w}</span>
-            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline"><i class="ph ph-trash text-sm"></i></button>
+            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline p-1"><i class="ph ph-trash text-sm"></i></button>
           </div>
         `).join('');
       }
@@ -927,7 +931,7 @@
         masterList.innerHTML = categoryList.map(c => `
           <div class="flex justify-between items-center p-2.5 bg-white/40 dark:bg-gray-800/40 rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-xs font-semibold">
             <span>${c}</span>
-            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash text-sm"></i></button>
+            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline p-1"><i class="ph ph-trash text-sm"></i></button>
           </div>
         `).join('');
       }
@@ -968,7 +972,7 @@
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          logActivity('Tambah Kas', `Kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          logActivity('Tambah Kas', `Kas ${tipe}: Rp${jumlah.toLocaleString('id-ID')}`);
           showToast('Transaksi disimpan!', 'success');
           closeModal('modalInputKas');
           document.getElementById('kasJumlah').value = '';
@@ -980,11 +984,18 @@
 
     function deleteKas(id) {
       showConfirm('Hapus Transaksi Kas', 'Apakah Anda yakin ingin menghapus transaksi ini?', () => {
+        // INSTANT LOCAL CACHE REMOVAL FOR ZERO DELAY
+        rawKasItems = rawKasItems.filter(i => String(i.id) !== String(id));
+        localStorage.setItem('cache_kas', JSON.stringify(rawKasItems));
+        renderKasList();
+
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
-            logActivity('Hapus Transaksi Kas', `ID: ${id}`);
-            syncAppData();
+            logActivity('Hapus Kas', `ID: ${id}`);
             showToast('Transaksi dihapus', 'success');
+            syncAppData();
+          } else {
+            showToast(res.message, 'error');
           }
         }).processClientRequest({ action: 'deleteKas', id: id });
       });
@@ -1000,7 +1011,7 @@
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          logActivity('Transfer Saldo', `Transfer Rp ${val.toLocaleString('id-ID')} dari ${from} ke ${to}`);
+          logActivity('Transfer Saldo', `Transfer Rp ${val.toLocaleString('id-ID')} dari ${from} ke${to}`);
           showToast('Transfer diselesaikan', 'success');
           closeModal('modalTransfer');
           document.getElementById('trfJumlah').value = '';
@@ -1027,17 +1038,23 @@
 
     function deleteDompet(name) {
       showConfirm('Hapus Dompet', `Apakah Anda yakin ingin menghapus dompet "${name}"?`, () => {
+        walletList = walletList.filter(w => String(w).trim().toLowerCase() !== String(name).trim().toLowerCase());
+        localStorage.setItem('cache_wallets', JSON.stringify(walletList));
+        populateDompetDropdowns();
+
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
             logActivity('Hapus Dompet', `Menghapus dompet: ${name}`);
-            syncAppData();
             showToast(`Dompet "${name}" dihapus`, 'success');
+            syncAppData();
+          } else {
+            showToast(res.message, 'error');
           }
         }).processClientRequest({ action: 'deleteDompet', name: name });
       });
     }
 
-    // ACCORDION HUTANG SMOOTH DETIL & HAPUS HUTANG
+    // ACCORDION HUTANG DETIL & HAPUS HUTANG
     function renderHutangList() {
       const container = document.getElementById('hutangListContainer');
       let totalHutang = 0, totalSisa = 0;
@@ -1054,7 +1071,6 @@
 
           const isLunas = stus === 'LUNAS';
           const cicilanList = h.cicilanHistory || [];
-
           return `
             <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
               <div onclick="toggleHutangAccordion('${h.id}')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
