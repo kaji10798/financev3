@@ -15,10 +15,7 @@
         extend: {
           colors: {
             brand: {
-              50: '#eff6ff',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8'
+              50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8'
             }
           }
         }
@@ -27,6 +24,9 @@
   </script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     body {
@@ -35,51 +35,45 @@
       overscroll-behavior-y: none;
     }
     ::-webkit-scrollbar { display: none; }
-    #dompetMenuOptions::-webkit-scrollbar,
-    #categoryFilterOptions::-webkit-scrollbar,
-    #modalDompetMenuOptions::-webkit-scrollbar,
-    #modalCategoryMenuOptions::-webkit-scrollbar,
-    #trfFromMenuOptions::-webkit-scrollbar,
-    #trfToMenuOptions::-webkit-scrollbar,
-    #htgTipeMenuOptions::-webkit-scrollbar,
-    #cclDompetMenuOptions::-webkit-scrollbar,
-    #sokonganNameMenuOptions::-webkit-scrollbar,
-    #sokonganTipeMenuOptions::-webkit-scrollbar,
-    #chartDimensionOptions::-webkit-scrollbar,
-    #chartTypeOptions::-webkit-scrollbar,
-    #logListContainer::-webkit-scrollbar {
-      width: 4px; display: block;
+    
+    /* Smooth Accordion Animation */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      opacity: 0;
     }
-    #dompetMenuOptions::-webkit-scrollbar-thumb,
-    #categoryFilterOptions::-webkit-scrollbar-thumb,
-    #modalDompetMenuOptions::-webkit-scrollbar-thumb,
-    #modalCategoryMenuOptions::-webkit-scrollbar-thumb,
-    #trfFromMenuOptions::-webkit-scrollbar-thumb,
-    #trfToMenuOptions::-webkit-scrollbar-thumb,
-    #htgTipeMenuOptions::-webkit-scrollbar-thumb,
-    #cclDompetMenuOptions::-webkit-scrollbar-thumb,
-    #sokonganNameMenuOptions::-webkit-scrollbar-thumb,
-    #sokonganTipeMenuOptions::-webkit-scrollbar-thumb,
-    #chartDimensionOptions::-webkit-scrollbar-thumb,
-    #chartTypeOptions::-webkit-scrollbar-thumb,
-    #logListContainer::-webkit-scrollbar-thumb {
-      background: #cbd5e1; border-radius: 4px;
+    .accordion-content.open {
+      opacity: 1;
     }
-    .tab-content { will-change: transform, opacity; }
-    .slide-left-enter { animation: slideLeftIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .slide-right-enter { animation: slideRightIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes slideLeftIn {
-      from { opacity: 0; transform: translateX(24px); }
-      to { opacity: 1; transform: translateX(0); }
+
+    /* Floating Header & Navigation Styling */
+    .floating-header {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 448px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
     }
-    @keyframes slideRightIn {
-      from { opacity: 0; transform: translateX(-24px); }
-      to { opacity: 1; transform: translateX(0); }
+    .floating-footer {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 448px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
     }
+
     .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     .modal.active { opacity: 1; pointer-events: auto; }
     .modal.active > div { transform: translateY(0); }
     .modal > div { transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    
     .toast-item { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-12px); }
@@ -93,14 +87,8 @@
     const google = {
       script: {
         run: {
-          withSuccessHandler: function(callback) {
-            this._success = callback;
-            return this;
-          },
-          withFailureHandler: function(callback) {
-            this._failure = callback;
-            return this;
-          },
+          withSuccessHandler: function(cb) { this._success = cb; return this; },
+          withFailureHandler: function(cb) { this._failure = cb; return this; },
           processClientRequest: function(payload) {
             const self = this;
             fetch(GAS_API_URL, {
@@ -109,22 +97,17 @@
               body: JSON.stringify(payload)
             })
             .then(res => res.json())
-            .then(res => {
-              if (self._success) self._success(res);
-            })
-            .catch(err => {
-              if (self._failure) self._failure(err);
-              else if (typeof showToast === 'function') showToast("Koneksi server gagal: " + err, "error");
-            });
+            .then(res => { if (self._success) self._success(res); })
+            .catch(err => { if (self._failure) self._failure(err); else if (typeof showToast === 'function') showToast("Koneksi gagal: " + err, "error"); });
           }
         }
       }
     };
   </script>
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pb-24 select-none antialiased overflow-x-hidden">
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pt-20 pb-28 select-none antialiased overflow-x-hidden">
 
-  <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs px-4 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs px-4 pointer-events-none"></div>
 
   <div id="modalConfirm" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-2xl p-5 text-center space-y-4 shadow-2xl border border-gray-100 dark:border-gray-700">
@@ -136,8 +119,8 @@
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="confirmMessage">Apakah Anda yakin?</p>
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1">
-        <button onclick="closeConfirmModal(false)" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-semibold hover:bg-gray-200">Batal</button>
-        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Lanjutkan</button>
+        <button onclick="closeConfirmModal()" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-semibold">Batal</button>
+        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
@@ -171,44 +154,37 @@
   </div>
 
   <div id="appView" class="hidden">
-    <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors">
-      <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+    <header class="floating-header z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 px-4 py-2.5">
+      <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg">
+          <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base">
             <i class="ph ph-wallet"></i>
           </div>
           <div>
-            <h1 class="text-sm font-bold leading-tight">Uang Kas Digital</h1>
-            <p id="userStatus" class="text-[10px] text-gray-500 dark:text-gray-400">Pengguna</p>
+            <h1 class="text-xs font-bold leading-tight">Uang Kas Digital</h1>
+            <p id="userStatus" class="text-[9px] text-gray-500 dark:text-gray-400">Pengguna</p>
           </div>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="toggleBalanceVisibility()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Sembunyikan/Tampilkan Saldo">
-            <i id="balanceEyeIcon" class="ph ph-eye text-lg"></i>
+          <button onclick="toggleDarkMode()" class="p-1.5 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Toggle Mode Gelap">
+            <i id="themeIcon" class="ph ph-moon text-base"></i>
           </button>
-          <button onclick="toggleDarkMode()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Toggle Mode Gelap">
-            <i id="themeIcon" class="ph ph-moon text-lg"></i>
-          </button>
-          <button onclick="handleLogout()" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Keluar">
-            <i class="ph ph-sign-out text-lg"></i>
+          <button onclick="handleLogout()" class="p-1.5 rounded-full text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Keluar">
+            <i class="ph ph-sign-out text-base"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <main class="max-w-md mx-auto px-4 pt-4">
+    <main class="max-w-md mx-auto px-4">
       <div id="tab-kas" class="tab-content">
         <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-blue-500/20 mb-4 relative overflow-hidden">
           <div class="relative z-10">
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs text-blue-100/80 font-medium">Total Saldo Kas</span>
-              <div class="relative">
-                <button onclick="toggleDropdown('dompetMenuOptions')" class="flex items-center gap-1 text-[11px] bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/20 transition">
-                  <span id="selectedDompetLabel" class="truncate max-w-[80px]">Semua Dompet</span>
-                  <i class="ph ph-caret-down"></i>
-                </button>
-                <div id="dompetMenuOptions" class="hidden absolute right-0 top-full mt-1.5 w-40 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl py-1 z-50 text-xs max-h-48 overflow-y-auto"></div>
-              </div>
+              <button onclick="toggleBalanceVisibility()" class="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition">
+                <i id="balanceEyeIcon" class="ph ph-eye text-sm"></i>
+              </button>
             </div>
             <h2 id="totalSaldo" class="text-2xl font-black tracking-tight">Rp 0</h2>
             <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/10">
@@ -256,21 +232,39 @@
         </div>
       </div>
 
-      <div id="tab-hutang" class="tab-content hidden">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-bold">Hutang & Piutang</h2>
+      <div id="tab-hutang" class="tab-content hidden space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gradient-to-br from-rose-500 to-rose-700 text-white p-4 rounded-3xl shadow-md">
+            <span class="text-[10px] opacity-80 block font-medium">Total Hutang</span>
+            <h3 id="cardTotalHutang" class="text-base font-black mt-0.5">Rp 0</h3>
+          </div>
+          <div class="bg-gradient-to-br from-amber-500 to-amber-700 text-white p-4 rounded-3xl shadow-md">
+            <span class="text-[10px] opacity-80 block font-medium">Sisa Belum Lunas</span>
+            <h3 id="cardSisaHutang" class="text-base font-black mt-0.5">Rp 0</h3>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold">Daftar Hutang & Piutang</h2>
           <button onclick="openModal('modalInputHutang')" class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1 shadow-sm">
             <i class="ph ph-plus"></i> Catat Baru
           </button>
         </div>
+
         <div id="hutangListContainer" class="space-y-2">
           <p class="text-xs text-center py-6 text-gray-400">Memuat catatan hutang...</p>
         </div>
       </div>
 
-      <div id="tab-sokongan" class="tab-content hidden">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-bold">Data Sokongan / Donasi</h2>
+      <div id="tab-sokongan" class="tab-content hidden space-y-4">
+        <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-3xl p-5 shadow-lg shadow-emerald-500/20">
+          <span class="text-xs text-emerald-100/80 font-medium">Total Dana Sokongan / Donasi</span>
+          <h2 id="totalSokonganAmount" class="text-2xl font-black mt-1">Rp 0</h2>
+          <p class="text-[10px] text-emerald-100/70 mt-1">*Terpisah secara independen dari Saldo Kas Utama</p>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold">Data Log Sokongan</h2>
           <button onclick="openModal('modalInputSokongan')" class="text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1 shadow-sm">
             <i class="ph ph-plus"></i> Tambah Donasi
           </button>
@@ -282,40 +276,61 @@
 
       <div id="tab-settings" class="tab-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
-          <div id="dompetMasterList" class="space-y-2 mb-3"></div>
-          <button onclick="openModal('modalInputDompet')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
-            + Tambah Dompet Baru
-          </button>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Profil Pengguna</h3>
+          <form onsubmit="submitUpdateProfile(event)" class="space-y-3">
+            <div>
+              <label class="text-[10px] font-semibold">Nama Lengkap</label>
+              <input type="text" id="profileNamaLengkap" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <div>
+              <label class="text-[10px] font-semibold">Username Baru</label>
+              <input type="text" id="profileUsername" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <div>
+              <label class="text-[10px] font-semibold">Password Baru (Opsional)</label>
+              <input type="password" id="profilePassword" placeholder="Kosongkan jika tak diubah" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Perubahan Profil</button>
+          </form>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Kategori Transaksi</h3>
-          <div id="categoryMasterList" class="space-y-2 mb-3"></div>
-          <button onclick="openModal('modalInputCategory')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
-            + Tambah Kategori Baru
-          </button>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Export Laporan Rapi</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="exportToPDF()" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="ph ph-file-pdf text-base"></i> Export PDF
+            </button>
+            <button onclick="exportToExcel()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="ph ph-file-xls text-base"></i> Export Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Audit Trail / Log Aktivitas</h3>
+          <input type="text" id="searchLogInput" onkeyup="renderActivityLogs()" placeholder="Cari aktivitas..." class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 mb-3 bg-gray-50 dark:bg-gray-900">
+          <div id="logListContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
       </div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-40">
-      <div class="max-w-md mx-auto grid grid-cols-4 py-2">
+    <nav class="floating-footer z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 px-2 py-1.5">
+      <div class="grid grid-cols-4">
         <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400">
-          <i class="ph ph-receipt text-xl"></i>
-          <span class="text-[10px] font-semibold mt-0.5">Kas</span>
+          <i class="ph ph-receipt text-lg"></i>
+          <span class="text-[9px] font-semibold mt-0.5">Kas</span>
         </button>
         <button onclick="switchTab('hutang')" id="nav-hutang" class="flex flex-col items-center justify-center text-gray-400">
-          <i class="ph ph-hand-coins text-xl"></i>
-          <span class="text-[10px] font-semibold mt-0.5">Hutang</span>
+          <i class="ph ph-hand-coins text-lg"></i>
+          <span class="text-[9px] font-semibold mt-0.5">Hutang</span>
         </button>
         <button onclick="switchTab('sokongan')" id="nav-sokongan" class="flex flex-col items-center justify-center text-gray-400">
-          <i class="ph ph-heart text-xl"></i>
-          <span class="text-[10px] font-semibold mt-0.5">Sokongan</span>
+          <i class="ph ph-heart text-lg"></i>
+          <span class="text-[9px] font-semibold mt-0.5">Sokongan</span>
         </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center justify-center text-gray-400">
-          <i class="ph ph-gear text-xl"></i>
-          <span class="text-[10px] font-semibold mt-0.5">Pengaturan</span>
+          <i class="ph ph-gear text-lg"></i>
+          <span class="text-[9px] font-semibold mt-0.5">Pengaturan</span>
         </button>
       </div>
     </nav>
@@ -336,77 +351,15 @@
           </select>
         </div>
         <div>
-          <label class="text-[10px] font-semibold">Pilih Dompet</label>
-          <select id="kasDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold">Pilih Kategori</label>
-          <select id="kasCategorySelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="kasJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="kasKet" required placeholder="Deskripsi transaksi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="kasKet" required placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
-        <button type="submit" id="btnSubmitKas" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Transaksi</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Transaksi</button>
       </form>
-    </div>
-  </div>
-
-  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Transfer Antar Dompet</h3>
-        <button onclick="closeModal('modalTransfer')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <form onsubmit="submitTransfer(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-semibold">Dari Dompet</label>
-          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold">Ke Dompet</label>
-          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Proses Transfer</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Analisis Grafik Keuangan</h3>
-        <button onclick="closeModal('modalAnalytics')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="text-[10px] font-semibold block mb-1">Dimensi</label>
-          <select id="chartDimensionSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-            <option value="dompet">Per Dompet</option>
-            <option value="kategori">Per Kategori</option>
-            <option value="flow">Cashflow (Masuk/Keluar)</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-[10px] font-semibold block mb-1">Tipe Grafik</label>
-          <select id="chartTypeSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-            <option value="doughnut">Donut / Lingkaran</option>
-            <option value="bar">Diagram Batang</option>
-            <option value="line">Garis Trend</option>
-          </select>
-        </div>
-      </div>
-      <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border dark:border-gray-700">
-        <canvas id="kasChart" class="w-full max-h-56"></canvas>
-      </div>
     </div>
   </div>
 
@@ -419,50 +372,10 @@
       <form onsubmit="submitPayHutang(event)" class="space-y-3">
         <input type="hidden" id="payHutangId">
         <div>
-          <label class="text-[10px] font-semibold">Sumber/Tujuan Dompet</label>
-          <select id="cclDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
-        </div>
-        <div>
           <label class="text-[10px] font-semibold">Jumlah Pembayaran (Rp)</label>
           <input type="text" id="payHutangAmount" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
-        <div>
-          <label class="text-[10px] font-semibold">Keterangan Cicilan</label>
-          <input type="text" id="payHutangKet" placeholder="Cicilan ke-..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
         <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Pembayaran</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Tambah Dompet Baru</h3>
-        <button onclick="closeModal('modalInputDompet')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <form onsubmit="submitAddDompet(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-semibold">Nama Dompet</label>
-          <input type="text" id="newDompetName" required placeholder="Contoh: Rekening BCA" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Dompet</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="modalInputCategory" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Tambah Kategori Baru</h3>
-        <button onclick="closeModal('modalInputCategory')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
-      </div>
-      <form onsubmit="submitAddCategory(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-semibold">Nama Kategori</label>
-          <input type="text" id="newCategoryName" required placeholder="Contoh: Hiburan, Tagihan" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Kategori</button>
       </form>
     </div>
   </div>
@@ -489,10 +402,6 @@
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="htgJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
-        <div>
-          <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="htgKet" placeholder="Catatan opsional..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
         <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Catatan</button>
       </form>
     </div>
@@ -501,7 +410,7 @@
   <div id="modalInputSokongan" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
     <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
-        <h3 class="font-bold text-sm">Tambah Data Sokongan / Donasi</h3>
+        <h3 class="font-bold text-sm">Tambah Donasi Sokongan</h3>
         <button onclick="closeModal('modalInputSokongan')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddSokongan(event)" class="space-y-3">
@@ -520,10 +429,6 @@
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
           <input type="text" id="sokonganJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
         </div>
-        <div>
-          <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="sokonganKet" placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-        </div>
         <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Donasi</button>
       </form>
     </div>
@@ -532,12 +437,11 @@
   <script>
     let currentUser = null;
     let rawKasItems = [];
-    let walletList = [];
-    let categoryList = JSON.parse(localStorage.getItem('app_categories') || '["Umum", "Makanan", "Belanja", "Transportasi", "Operasional", "Transfer"]');
+    let rawHutangItems = [];
+    let rawSokonganItems = [];
+    let activityLogs = JSON.parse(localStorage.getItem('app_activity_logs') || '[]');
     let isBalanceVisible = localStorage.getItem('balance_visible') !== 'false';
-    let selectedFilterWallet = 'ALL';
     let pendingConfirmCallback = null;
-    let mainKasChartInstance = null;
 
     function formatNumberInput(element) {
       if (!element) return;
@@ -565,6 +469,40 @@
       }
     });
 
+    function logActivity(action, details) {
+      const logItem = {
+        timestamp: new Date().toLocaleString('id-ID'),
+        user: currentUser ? (currentUser.namaLengkap || currentUser.username) : 'Sistem',
+        action: action,
+        details: details
+      };
+      activityLogs.unshift(logItem);
+      if (activityLogs.length > 50) activityLogs.pop();
+      localStorage.setItem('app_activity_logs', JSON.stringify(activityLogs));
+    }
+
+    function renderActivityLogs() {
+      const container = document.getElementById('logListContainer');
+      const searchVal = document.getElementById('searchLogInput') ? document.getElementById('searchLogInput').value.toLowerCase() : '';
+      if (!container) return;
+      container.innerHTML = '';
+      let filtered = activityLogs.filter(l => (l.user || '').toLowerCase().includes(searchVal) || (l.action || '').toLowerCase().includes(searchVal));
+      if (!filtered.length) {
+        container.innerHTML = '<div class="text-center py-4 text-gray-400 text-xs">Belum ada aktivitas.</div>';
+        return;
+      }
+      container.innerHTML = filtered.map(l => `
+        <div class="p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs space-y-0.5">
+          <div class="flex justify-between items-center font-bold text-blue-600 dark:text-blue-400">
+            <span>${l.user}</span>
+            <span class="text-[9px] text-gray-400">${l.timestamp}</span>
+          </div>
+          <p class="font-semibold text-gray-700 dark:text-gray-200">${l.action}</p>
+          <p class="text-[10px] text-gray-500 dark:text-gray-400">${l.details}</p>
+        </div>
+      `).join('');
+    }
+
     function showToast(msg, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -579,13 +517,13 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
       const themeIcon = document.getElementById('themeIcon');
-      if (themeIcon) themeIcon.className = isDark ? 'ph ph-sun text-lg' : 'ph ph-moon text-lg';
+      if (themeIcon) themeIcon.className = isDark ? 'ph ph-sun text-base' : 'ph ph-moon text-base';
     }
 
     function toggleBalanceVisibility() {
       isBalanceVisible = !isBalanceVisible;
       localStorage.setItem('balance_visible', isBalanceVisible);
-      document.getElementById('balanceEyeIcon').className = isBalanceVisible ? 'ph ph-eye text-lg' : 'ph ph-eye-slash text-lg';
+      document.getElementById('balanceEyeIcon').className = isBalanceVisible ? 'ph ph-eye text-sm' : 'ph ph-eye-slash text-sm';
       renderKasList();
     }
 
@@ -622,6 +560,7 @@
       pendingConfirmCallback = null;
     }
 
+    // LOGIN & DIRECT FETCH DATA
     function handleLogin(e) {
       e.preventDefault();
       const u = document.getElementById('loginUsername').value;
@@ -634,6 +573,7 @@
         if (res.status === 'success') {
           currentUser = res.user;
           localStorage.setItem('user_kas', JSON.stringify(currentUser));
+          logActivity('Login', 'Berhasil masuk ke aplikasi');
           showApp();
           showToast(`Selamat datang, ${currentUser.namaLengkap || currentUser.username}`, 'success');
         } else {
@@ -643,20 +583,28 @@
     }
 
     function handleLogout() {
+      logActivity('Logout', 'Keluar dari aplikasi');
       localStorage.removeItem('user_kas');
       currentUser = null;
       document.getElementById('appView').classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
     }
 
+    // MEMUAT DATA SECARA LANGSUNG SETELAH SHOW APP
     function showApp() {
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('appView').classList.remove('hidden');
       document.getElementById('userStatus').innerText = currentUser.namaLengkap || currentUser.username;
+      
+      // Load Profile Input Data
+      document.getElementById('profileNamaLengkap').value = currentUser.namaLengkap || '';
+      document.getElementById('profileUsername').value = currentUser.username || '';
+
+      // Direct Fetch All Data Immediately
       loadKasData();
       loadHutangData();
       loadSokonganData();
-      renderCategoryMaster();
+      renderActivityLogs();
     }
 
     function switchTab(tabName) {
@@ -671,16 +619,14 @@
           if (nav) nav.className = "flex flex-col items-center justify-center text-gray-400";
         }
       });
+      if (tabName === 'settings') renderActivityLogs();
     }
 
     function loadKasData() {
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
           rawKasItems = res.data || [];
-          walletList = res.wallets || ["Utama"];
           renderKasList();
-          populateDompetDropdowns();
-          populateCategoryDropdowns();
         }
       }).processClientRequest({ action: 'getKasData' });
     }
@@ -702,7 +648,7 @@
             <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
               <div>
                 <p class="text-xs font-bold">${item.keterangan || item.Description || 'Transaksi'}</p>
-                <span class="text-[10px] text-gray-400">${item.dompet || item.Dompet} • ${item.kategori || item.Category || 'Umum'}</span>
+                <span class="text-[10px] text-gray-400">${item.dompet || 'Utama'}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
@@ -722,176 +668,123 @@
       document.getElementById('kasCountLabel').innerText = `${rawKasItems.length} data`;
     }
 
-    function populateDompetDropdowns() {
-      const trfFrom = document.getElementById('trfFrom');
-      const trfTo = document.getElementById('trfTo');
-      const kasDompetSelect = document.getElementById('kasDompetSelect');
-      const cclDompetSelect = document.getElementById('cclDompetSelect');
-      const masterList = document.getElementById('dompetMasterList');
-
-      const optionsHtml = walletList.map(w => `<option value="${w}">${w}</option>`).join('');
-      if (trfFrom) trfFrom.innerHTML = optionsHtml;
-      if (trfTo) trfTo.innerHTML = optionsHtml;
-      if (kasDompetSelect) kasDompetSelect.innerHTML = optionsHtml;
-      if (cclDompetSelect) cclDompetSelect.innerHTML = optionsHtml;
-
-      if (masterList) {
-        masterList.innerHTML = walletList.map(w => `
-          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
-            <span>${w}</span>
-            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
-          </div>
-        `).join('');
-      }
-    }
-
-    function populateCategoryDropdowns() {
-      const sel = document.getElementById('kasCategorySelect');
-      if (sel) {
-        sel.innerHTML = categoryList.map(c => `<option value="${c}">${c}</option>`).join('');
-      }
-      renderCategoryMaster();
-    }
-
-    function renderCategoryMaster() {
-      const masterList = document.getElementById('categoryMasterList');
-      if (masterList) {
-        masterList.innerHTML = categoryList.map(c => `
-          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
-            <span>${c}</span>
-            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
-          </div>
-        `).join('');
-      }
-    }
-
-    function submitAddCategory(e) {
-      e.preventDefault();
-      const input = document.getElementById('newCategoryName');
-      const val = input.value.trim();
-      if (val && !categoryList.includes(val)) {
-        categoryList.push(val);
-        localStorage.setItem('app_categories', JSON.stringify(categoryList));
-        populateCategoryDropdowns();
-        closeModal('modalInputCategory');
-        input.value = '';
-        showToast(`Kategori "${val}" ditambahkan`, 'success');
-      }
-    }
-
-    function deleteCategory(name) {
-      showConfirm('Hapus Kategori', `Hapus kategori "${name}"?`, () => {
-        categoryList = categoryList.filter(c => c !== name);
-        localStorage.setItem('app_categories', JSON.stringify(categoryList));
-        populateCategoryDropdowns();
-        showToast(`Kategori "${name}" dihapus`, 'success');
-      });
-    }
-
     function submitAddKas(e) {
       e.preventDefault();
       const tipe = document.getElementById('kasTipe').value;
-      const dompet = document.getElementById('kasDompetSelect').value;
-      const kategori = document.getElementById('kasCategorySelect').value;
       const jumlah = getUnformattedNumber('kasJumlah');
       const ket = document.getElementById('kasKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          showToast('Transaksi berhasil disimpan!', 'success');
+          logActivity('Tambah Transaksi', `Tambah kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          showToast('Transaksi disimpan!', 'success');
           closeModal('modalInputKas');
           document.getElementById('kasJumlah').value = '';
           document.getElementById('kasKet').value = '';
           loadKasData();
-        } else {
-          showToast(res.message, 'error');
         }
-      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket, dompet: dompet, kategori: kategori });
+      }).processClientRequest({ action: 'addKas', tipe: tipe, jumlah: jumlah, keterangan: ket });
     }
 
     function deleteKas(id) {
       showConfirm('Hapus Transaksi', 'Apakah Anda yakin ingin menghapus transaksi ini?', () => {
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
+            logActivity('Hapus Transaksi', `Hapus kas ID: ${id}`);
             loadKasData();
-            showToast('Transaksi berhasil dihapus', 'success');
+            showToast('Transaksi dihapus', 'success');
           }
         }).processClientRequest({ action: 'deleteKas', id: id });
       });
     }
 
-    function submitTransfer(e) {
-      e.preventDefault();
-      const from = document.getElementById('trfFrom').value;
-      const to = document.getElementById('trfTo').value;
-      const val = getUnformattedNumber('trfJumlah');
-
-      if (from === to) { showToast('Dompet asal dan tujuan tidak boleh sama', 'error'); return; }
-
-      google.script.run.withSuccessHandler(res => {
-        if (res.status === 'success') {
-          showToast('Transfer berhasil diselesaikan', 'success');
-          closeModal('modalTransfer');
-          document.getElementById('trfJumlah').value = '';
-          loadKasData();
-        }
-      }).processClientRequest({ action: 'transferSaldo', from: from, to: to, jumlah: val });
-    }
-
-    function submitAddDompet(e) {
-      e.preventDefault();
-      const name = document.getElementById('newDompetName').value.trim();
-      if (name) {
-        google.script.run.withSuccessHandler(res => {
-          if (res.status === 'success') {
-            closeModal('modalInputDompet');
-            document.getElementById('newDompetName').value = '';
-            loadKasData();
-            showToast(`Dompet "${name}" ditambahkan`, 'success');
-          }
-        }).processClientRequest({ action: 'addDompet', name: name });
-      }
-    }
-
-    function deleteDompet(name) {
-      showConfirm('Hapus Dompet', `Hapus dompet "${name}"?`, () => {
-        google.script.run.withSuccessHandler(res => {
-          if (res.status === 'success') {
-            loadKasData();
-            showToast(`Dompet "${name}" dihapus`, 'success');
-          }
-        }).processClientRequest({ action: 'deleteDompet', name: name });
-      });
-    }
-
+    // ACCORDION HUTANG DETIL SMOOTH + CARD TOTAL
     function loadHutangData() {
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          const container = document.getElementById('hutangListContainer');
-          if (!res.data.length) {
-            container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada catatan hutang.</p>`;
-            return;
-          }
-          container.innerHTML = res.data.map(h => `
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-              <div>
-                <span class="text-[9px] font-bold uppercase tracking-wider ${h.tipe === 'Hutang' || h.Tipe === 'Hutang' ? 'text-rose-500' : 'text-blue-500'}">${h.tipe || h.Tipe}</span>
-                <p class="text-xs font-bold">${h.nama || h.Nama}</p>
-                <p class="text-[10px] text-gray-400">Sisa: Rp ${Number(h.sisa || h.Sisa).toLocaleString('id-ID')} / Rp ${Number(h.jumlah || h.Jumlah).toLocaleString('id-ID')}</p>
-              </div>
-              <div class="flex items-center gap-2">
-                ${(h.status || h.Status) !== 'LUNAS' ? `<button onclick="openPayHutangModal('${h.id || h.ID}', '${h.nama || h.Nama}')" class="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-xl font-bold">Bayar</button>` : '<span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-600">LUNAS</span>'}
-              </div>
-            </div>
-          `).join('');
+          rawHutangItems = res.data || [];
+          renderHutangList();
         }
       }).processClientRequest({ action: 'getHutangData' });
+    }
+
+    function renderHutangList() {
+      const container = document.getElementById('hutangListContainer');
+      let totalHutang = 0, totalSisa = 0;
+
+      if (!rawHutangItems.length) {
+        container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada catatan hutang.</p>`;
+      } else {
+        container.innerHTML = rawHutangItems.map(h => {
+          const jml = Number(h.jumlah || h.Jumlah || 0);
+          const ssa = Number(h.sisa || h.Sisa || 0);
+          const stus = h.status || h.Status;
+          totalHutang += jml;
+          totalSisa += ssa;
+
+          const isLunas = stus === 'LUNAS';
+          const cicilanList = h.cicilanHistory || [];
+
+          return `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+              <div onclick="toggleHutangAccordion('${h.id}')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                <div>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${h.tipe === 'Hutang' ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}">${h.tipe}</span>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isLunas ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${stus}</span>
+                  </div>
+                  <p class="text-xs font-bold">${h.nama}</p>
+                </div>
+                <div class="text-right flex items-center gap-2">
+                  <div>
+                    <p class="text-xs font-bold text-gray-800 dark:text-gray-100">Rp ${ssa.toLocaleString('id-ID')}</p>
+                    <span class="text-[9px] text-gray-400 block">Total: Rp ${jml.toLocaleString('id-ID')}</span>
+                  </div>
+                  <i id="accIcon-${h.id}" class="ph ph-caret-down text-gray-400 text-xs transition-transform duration-300"></i>
+                </div>
+              </div>
+
+              <div id="accContent-${h.id}" class="accordion-content bg-gray-50 dark:bg-gray-900/50 px-3.5 border-t border-gray-100 dark:border-gray-700">
+                <div class="py-3 space-y-2">
+                  <p class="text-[10px] text-gray-500"><strong>Keterangan:</strong> ${h.keterangan || '-'}</p>
+                  <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
+                    <span class="text-[10px] font-bold block mb-1">Riwayat Cicilan Pembayaran:</span>
+                    ${!cicilanList.length ? '<p class="text-[10px] text-gray-400">Belum ada cicilan.</p>' : 
+                      cicilanList.map(c => `<div class="flex justify-between text-[10px] py-0.5"><span class="text-gray-400">${c.date}</span><span class="font-semibold text-emerald-500">Rp ${Number(c.amount).toLocaleString('id-ID')}</span></div>`).join('')
+                    }
+                  </div>
+                  <div class="pt-2 flex justify-end gap-2">
+                    ${!isLunas ? `<button onclick="openPayHutangModal('${h.id}', '${h.nama}')" class="px-3 py-1 bg-emerald-600 text-white rounded-xl text-[10px] font-bold shadow-sm">Bayar Cicilan</button>` : ''}
+                    <button onclick="deleteHutang('${h.id}')" class="px-3 py-1 bg-rose-500/10 text-rose-500 rounded-xl text-[10px] font-bold">Hapus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('cardTotalHutang').innerText = `Rp ${totalHutang.toLocaleString('id-ID')}`;
+      document.getElementById('cardSisaHutang').innerText = `Rp ${totalSisa.toLocaleString('id-ID')}`;
+    }
+
+    function toggleHutangAccordion(id) {
+      const content = document.getElementById(`accContent-${id}`);
+      const icon = document.getElementById(`accIcon-${id}`);
+      if (content.classList.contains('open')) {
+        content.style.maxHeight = '0px';
+        content.classList.remove('open');
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+      }
     }
 
     function openPayHutangModal(id, nama) {
       document.getElementById('payHutangId').value = id;
       document.getElementById('payHutangTitle').innerText = `Bayar Cicilan (${nama})`;
-      populateDompetDropdowns();
       openModal('modalPayHutang');
     }
 
@@ -899,20 +792,16 @@
       e.preventDefault();
       const id = document.getElementById('payHutangId').value;
       const amount = getUnformattedNumber('payHutangAmount');
-      const dompet = document.getElementById('cclDompetSelect').value;
-      const ket = document.getElementById('payHutangKet').value;
-
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
+          logActivity('Bayar Hutang', `Bayar cicilan ID ${id}: Rp ${amount.toLocaleString('id-ID')}`);
           showToast('Cicilan berhasil dibayarkan!', 'success');
           closeModal('modalPayHutang');
           document.getElementById('payHutangAmount').value = '';
           loadHutangData();
           loadKasData();
-        } else {
-          showToast(res.message, 'error');
         }
-      }).processClientRequest({ action: 'payHutang', id: id, amount: amount, dompet: dompet, keterangan: ket });
+      }).processClientRequest({ action: 'payHutang', id: id, amount: amount });
     }
 
     function submitAddHutang(e) {
@@ -920,36 +809,63 @@
       const tipe = document.getElementById('htgTipe').value;
       const nama = document.getElementById('htgNama').value;
       const jumlah = getUnformattedNumber('htgJumlah');
-      const ket = document.getElementById('htgKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          showToast('Catatan hutang berhasil dibuat', 'success');
+          logActivity('Tambah Hutang', `Tambah ${tipe} ${nama}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          showToast('Catatan hutang dibuat', 'success');
           closeModal('modalInputHutang');
           loadHutangData();
         }
-      }).processClientRequest({ action: 'addHutang', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
+      }).processClientRequest({ action: 'addHutang', tipe: tipe, nama: nama, jumlah: jumlah });
     }
 
+    function deleteHutang(id) {
+      showConfirm('Hapus Catatan', 'Hapus catatan hutang ini?', () => {
+        google.script.run.withSuccessHandler(res => {
+          if (res.status === 'success') {
+            logActivity('Hapus Hutang', `Menghapus hutang ID: ${id}`);
+            loadHutangData();
+            showToast('Catatan dihapus', 'success');
+          }
+        }).processClientRequest({ action: 'deleteHutang', id: id });
+      });
+    }
+
+    // DANA SOKONGAN INDEPENDEN (TERPISAH DARI PEMASUKAN KAS)
     function loadSokonganData() {
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          const container = document.getElementById('sokonganListContainer');
-          if (!res.data.length) {
-            container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada data sokongan/donasi.</p>`;
-            return;
-          }
-          container.innerHTML = res.data.map(s => `
-            <div class="p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-              <div>
-                <p class="text-xs font-bold">${s.nama || s.Nama}</p>
-                <span class="text-[10px] text-gray-400">${s.keterangan || s.Keterangan || 'Donasi'}</span>
-              </div>
-              <span class="text-xs font-bold text-emerald-500">+ Rp ${Number(s.jumlah || s.Jumlah).toLocaleString('id-ID')}</span>
-            </div>
-          `).join('');
+          rawSokonganItems = res.data || [];
+          renderSokonganList();
         }
       }).processClientRequest({ action: 'getSokonganData' });
+    }
+
+    function renderSokonganList() {
+      const container = document.getElementById('sokonganListContainer');
+      let totalSokongan = 0;
+
+      if (!rawSokonganItems.length) {
+        container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada data sokongan.</p>`;
+      } else {
+        container.innerHTML = rawSokonganItems.map(s => {
+          const val = Number(s.jumlah || 0);
+          totalSokongan += val;
+
+          return `
+            <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div>
+                <p class="text-xs font-bold">${s.nama}</p>
+                <span class="text-[10px] text-gray-400">${s.date ? new Date(s.date).toLocaleDateString('id-ID') : ''}</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-500">+ Rp ${val.toLocaleString('id-ID')}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('totalSokonganAmount').innerText = `Rp ${totalSokongan.toLocaleString('id-ID')}`;
     }
 
     function submitAddSokongan(e) {
@@ -957,72 +873,93 @@
       const tipe = document.getElementById('sokonganTipe').value;
       const nama = document.getElementById('sokonganNama').value;
       const jumlah = getUnformattedNumber('sokonganJumlah');
-      const ket = document.getElementById('sokonganKet').value;
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          showToast('Data donasi berhasil disimpan', 'success');
+          logActivity('Tambah Sokongan', `Tambah donasi ${nama}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          showToast('Data donasi disimpan', 'success');
           closeModal('modalInputSokongan');
           loadSokonganData();
         }
-      }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
+      }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah });
     }
 
-    // ANALYTICS & CHART JS (DIKEMBALIKAN KODE SEPENUHNYA)
+    // PROFIL PENGGUNA MANAGER
+    function submitUpdateProfile(e) {
+      e.preventDefault();
+      const newN = document.getElementById('profileNamaLengkap').value;
+      const newU = document.getElementById('profileUsername').value;
+      const newP = document.getElementById('profilePassword').value;
+
+      google.script.run.withSuccessHandler(res => {
+        if (res.status === 'success') {
+          currentUser.namaLengkap = newN;
+          currentUser.username = newU;
+          localStorage.setItem('user_kas', JSON.stringify(currentUser));
+          document.getElementById('userStatus').innerText = newN || newU;
+          logActivity('Update Profil', 'Memperbarui data profil pengguna');
+          showToast('Profil berhasil diperbarui', 'success');
+        }
+      }).processClientRequest({ action: 'updateProfile', oldUsername: currentUser.username, newUsername: newU, newPassword: newP, newNamaLengkap: newN });
+    }
+
+    // EXPORT LAPORAN EXCEL & PDF RAPI
+    function exportToExcel() {
+      const dataToExport = rawKasItems.map(i => ({
+        ID: i.id,
+        Tanggal: i.date ? new Date(i.date).toLocaleDateString('id-ID') : '',
+        Tipe: i.tipe,
+        Jumlah: i.jumlah,
+        Keterangan: i.keterangan,
+        Dompet: i.dompet || 'Utama'
+      }));
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Data Kas");
+      XLSX.writeFile(wb, "Laporan_Uang_Kas_Digital.xlsx");
+      logActivity('Export Laporan', 'Mengeksport data kas ke format Excel');
+      showToast('Laporan Excel berhasil diunduh', 'success');
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Laporan Keuangan Uang Kas Digital", 14, 15);
+      
+      const tableRows = rawKasItems.map(i => [
+        i.id,
+        i.date ? new Date(i.date).toLocaleDateString('id-ID') : '',
+        i.tipe,
+        `Rp ${Number(i.jumlah).toLocaleString('id-ID')}`,
+        i.keterangan
+      ]);
+
+      doc.autoTable({
+        head: [['ID', 'Tanggal', 'Tipe', 'Jumlah', 'Keterangan']],
+        body: tableRows,
+        startY: 22,
+        theme: 'striped'
+      });
+
+      doc.save("Laporan_Uang_Kas_Digital.pdf");
+      logActivity('Export Laporan', 'Mengeksport data kas ke format PDF');
+      showToast('Laporan PDF berhasil diunduh', 'success');
+    }
+
+    // ANALYTICS CHART MODAL
     function openAnalyticsModal() {
       openModal('modalAnalytics');
-      renderAnalyticsChart();
-    }
-
-    function renderAnalyticsChart() {
-      const dim = document.getElementById('chartDimensionSelect').value;
-      const type = document.getElementById('chartTypeSelect').value;
       const ctx = document.getElementById('kasChart').getContext('2d');
-
-      if (mainKasChartInstance) mainKasChartInstance.destroy();
-
-      let labels = [];
-      let data = [];
-      let mapData = {};
-
-      if (dim === 'dompet') {
-        rawKasItems.forEach(i => {
-          let d = i.dompet || i.Dompet || 'Utama';
-          let val = Number(i.jumlah || i.Amount || 0);
-          mapData[d] = (mapData[d] || 0) + val;
-        });
-      } else if (dim === 'kategori') {
-        rawKasItems.forEach(i => {
-          let k = i.kategori || i.Category || 'Umum';
-          let val = Number(i.jumlah || i.Amount || 0);
-          mapData[k] = (mapData[k] || 0) + val;
-        });
-      } else {
-        let masuk = 0, keluar = 0;
-        rawKasItems.forEach(i => {
-          let t = i.tipe || i.Type;
-          let val = Number(i.jumlah || i.Amount || 0);
-          if (t === 'MASUK' || t === 'Pemasukan') masuk += val; else keluar += val;
-        });
-        mapData = { 'Pemasukan': masuk, 'Pengeluaran': keluar };
-      }
-
-      labels = Object.keys(mapData);
-      data = Object.values(mapData);
-
-      mainKasChartInstance = new Chart(ctx, {
-        type: type,
+      let masuk = 0, keluar = 0;
+      rawKasItems.forEach(i => {
+        if (i.tipe === 'MASUK' || i.tipe === 'Pemasukan') masuk += Number(i.jumlah || 0);
+        else keluar += Number(i.jumlah || 0);
+      });
+      new Chart(ctx, {
+        type: 'doughnut',
         data: {
-          labels: labels,
-          datasets: [{
-            label: 'Nominal (Rp)',
-            data: data,
-            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: true, position: 'bottom' } }
+          labels: ['Pemasukan', 'Pengeluaran'],
+          datasets: [{ data: [masuk, keluar], backgroundColor: ['#10b981', '#ef4444'] }]
         }
       });
     }
