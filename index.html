@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Uang Kas Digital</title>
+  <title>Uang Kas Digital - Liquid Glass</title>
 
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/781/781760.png">
 
@@ -31,12 +31,45 @@
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overscroll-behavior-y: none;
+      background: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.15), transparent 40%),
+                  radial-gradient(circle at 85% 85%, rgba(147, 51, 234, 0.15), transparent 40%);
+      background-attachment: fixed;
     }
     ::-webkit-scrollbar { display: none; }
     
-    /* Smooth Accordion Animation */
+    /* GLASSMORPHISM CARD LIQUID EFFECT */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+    .dark .glass-card {
+      background: rgba(17, 24, 39, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    /* FLOATING GLASS HEADER & FOOTER NAV */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .dark .glass-nav {
+      background: rgba(31, 41, 55, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* SMOOTH ACCORDION TRANSITION */
     .accordion-content {
       max-height: 0;
       overflow: hidden;
@@ -45,28 +78,6 @@
     }
     .accordion-content.open {
       opacity: 1;
-    }
-
-    /* Floating Header & Navigation Styling */
-    .floating-header {
-      position: fixed;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 448px;
-      border-radius: 9999px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    .floating-footer {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 448px;
-      border-radius: 9999px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -105,28 +116,28 @@
     };
   </script>
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pt-20 pb-28 select-none antialiased overflow-x-hidden">
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen pt-20 pb-32 select-none antialiased overflow-x-hidden">
 
   <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs px-4 pointer-events-none"></div>
 
-  <div id="modalConfirm" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-2xl p-5 text-center space-y-4 shadow-2xl border border-gray-100 dark:border-gray-700">
+  <div id="modalConfirm" class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="w-full max-w-xs glass-card rounded-3xl p-5 text-center space-y-4 shadow-2xl">
       <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto text-2xl">
         <i class="ph ph-warning-circle font-bold"></i>
       </div>
       <div>
-        <h4 class="font-bold text-sm text-gray-800 dark:text-gray-100" id="confirmTitle">Konfirmasi</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="confirmMessage">Apakah Anda yakin?</p>
+        <h4 class="font-bold text-sm text-gray-800 dark:text-gray-100" id="confirmTitle">Konfirmasi Hapus</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="confirmMessage">Apakah Anda yakin ingin menghapus data ini?</p>
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1">
-        <button onclick="closeConfirmModal()" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-semibold">Batal</button>
-        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Lanjutkan</button>
+        <button onclick="closeConfirmModal()" class="py-2.5 bg-gray-200/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold">Batal</button>
+        <button id="btnConfirmAction" class="py-2.5 bg-rose-600 text-white rounded-xl text-xs font-semibold shadow-md">Ya, Hapus</button>
       </div>
     </div>
   </div>
 
-  <div id="loginView" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm">
-    <div class="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700">
+  <div id="loginView" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-md">
+    <div class="w-full max-w-sm p-6 glass-card rounded-3xl shadow-2xl">
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 mb-3">
           <i class="ph ph-wallet-bold text-3xl"></i>
@@ -137,12 +148,12 @@
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label class="text-xs font-semibold mb-1 block">Username</label>
-          <input type="text" id="loginUsername" autocomplete="username" required class="w-full px-4 py-3 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="loginUsername" autocomplete="username" required class="w-full px-4 py-3 text-sm rounded-xl border border-gray-300/60 dark:border-gray-600/60 bg-white/50 dark:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
           <label class="text-xs font-semibold mb-1 block">Password</label>
           <div class="relative">
-            <input type="password" id="loginPassword" autocomplete="current-password" required class="w-full px-4 py-3 pr-10 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="password" id="loginPassword" autocomplete="current-password" required class="w-full px-4 py-3 pr-10 text-sm rounded-xl border border-gray-300/60 dark:border-gray-600/60 bg-white/50 dark:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
               <i id="passwordEyeIcon" class="ph ph-eye text-lg"></i>
             </button>
@@ -154,7 +165,7 @@
   </div>
 
   <div id="appView" class="hidden">
-    <header class="floating-header z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 px-4 py-2.5">
+    <header class="fixed top-3 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-md glass-nav rounded-full px-4 py-2.5 shadow-lg">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base">
@@ -166,10 +177,10 @@
           </div>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="syncAppData()" class="p-1.5 rounded-full text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Refresh Sync Data">
+          <button onclick="syncAppData()" class="p-1.5 rounded-full text-blue-600 dark:text-blue-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition" title="Refresh Sync Data">
             <i class="ph ph-arrows-clockwise text-base"></i>
           </button>
-          <button onclick="toggleDarkMode()" class="p-1.5 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Toggle Mode Gelap">
+          <button onclick="toggleDarkMode()" class="p-1.5 rounded-full text-gray-500 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition" title="Toggle Mode Gelap">
             <i id="themeIcon" class="ph ph-moon text-base"></i>
           </button>
           <button onclick="handleLogout()" class="p-1.5 rounded-full text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Keluar">
@@ -181,7 +192,7 @@
 
     <main class="max-w-md mx-auto px-4">
       <div id="tab-kas" class="tab-content">
-        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-blue-500/20 mb-4 relative overflow-hidden">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-5 shadow-xl shadow-blue-500/20 mb-4 relative overflow-hidden">
           <div class="relative z-10">
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs text-blue-100/80 font-medium">Total Saldo Kas</span>
@@ -203,33 +214,27 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2 mb-4">
-          <button onclick="openModal('modalInputKas')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1">
-              <i class="ph ph-plus text-base"></i>
-            </div>
-            <span class="text-[11px] font-semibold">Transaksi</span>
-          </button>
-          <button onclick="openModal('modalTransfer')" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
-            <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          <button onclick="openModal('modalTransfer')" class="flex flex-col items-center justify-center p-3 glass-card rounded-2xl active:scale-95 transition">
+            <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
               <i class="ph ph-arrows-left-right text-base"></i>
             </div>
-            <span class="text-[11px] font-semibold">Transfer</span>
+            <span class="text-[11px] font-semibold">Transfer Dompet</span>
           </button>
-          <button onclick="openAnalyticsModal()" class="flex flex-col items-center justify-center p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-95 transition">
-            <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-1">
+          <button onclick="openAnalyticsModal()" class="flex flex-col items-center justify-center p-3 glass-card rounded-2xl active:scale-95 transition">
+            <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-1">
               <i class="ph ph-chart-pie text-base"></i>
             </div>
-            <span class="text-[11px] font-semibold">Analisis</span>
+            <span class="text-[11px] font-semibold">Analisis Grafik</span>
           </button>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="glass-card rounded-3xl p-4 shadow-sm">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Riwayat Transaksi</h3>
-            <span id="kasCountLabel" class="text-[10px] bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full font-bold">0 data</span>
+            <span id="kasCountLabel" class="text-[10px] bg-gray-200/50 dark:bg-gray-700/50 px-2 py-0.5 rounded-full font-bold">0 data</span>
           </div>
-          <div id="kasListContainer" class="space-y-2 max-h-[380px] overflow-y-auto">
+          <div id="kasListContainer" class="space-y-2 max-h-[360px] overflow-y-auto">
             <p class="text-xs text-center py-6 text-gray-400">Memuat riwayat transaksi...</p>
           </div>
         </div>
@@ -277,64 +282,112 @@
         </div>
       </div>
 
-      <div id="tab-settings" class="tab-content hidden space-y-4">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Profil Pengguna</h3>
-          <form onsubmit="submitUpdateProfile(event)" class="space-y-3">
-            <div>
-              <label class="text-[10px] font-semibold">Nama Lengkap</label>
-              <input type="text" id="profileNamaLengkap" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-            </div>
-            <div>
-              <label class="text-[10px] font-semibold">Username Baru</label>
-              <input type="text" id="profileUsername" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-            </div>
-            <div>
-              <label class="text-[10px] font-semibold">Password Baru (Opsional)</label>
-              <input type="password" id="profilePassword" placeholder="Kosongkan jika tak diubah" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-            </div>
-            <button type="submit" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Perubahan Profil</button>
-          </form>
-        </div>
+      <div id="tab-settings" class="tab-content hidden space-y-3">
+        <h2 class="text-sm font-bold mb-2">Pengaturan & Informasi</h2>
 
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Dompet</h3>
-          <div id="dompetMasterList" class="space-y-2 mb-3"></div>
-          <button onclick="openModal('modalInputDompet')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
-            + Tambah Dompet Baru
-          </button>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Master Kategori Transaksi</h3>
-          <div id="categoryMasterList" class="space-y-2 mb-3"></div>
-          <button onclick="openModal('modalInputCategory')" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">
-            + Tambah Kategori Baru
-          </button>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Export Laporan Rapi</h3>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="exportToPDF()" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
-              <i class="ph ph-file-pdf text-base"></i> Export PDF
-            </button>
-            <button onclick="exportToExcel()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
-              <i class="ph ph-file-xls text-base"></i> Export Excel
-            </button>
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+          <div onclick="toggleSettingsAccordion('setAccProfil')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="ph ph-user text-lg text-blue-500"></i>
+              <span class="text-xs font-bold">Profil Pengguna</span>
+            </div>
+            <i id="setAccIcon-setAccProfil" class="ph ph-caret-down text-xs text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div id="setAccProfil" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-4">
+            <form onsubmit="submitUpdateProfile(event)" class="py-3 space-y-3">
+              <div>
+                <label class="text-[10px] font-semibold">Nama Lengkap</label>
+                <input type="text" id="profileNamaLengkap" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
+              </div>
+              <div>
+                <label class="text-[10px] font-semibold">Username Baru</label>
+                <input type="text" id="profileUsername" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
+              </div>
+              <div>
+                <label class="text-[10px] font-semibold">Password Baru (Opsional)</label>
+                <input type="password" id="profilePassword" placeholder="Kosongkan jika tidak diubah" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Perubahan Profil</button>
+            </form>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Audit Trail / Log Aktivitas</h3>
-          <input type="text" id="searchLogInput" onkeyup="renderActivityLogs()" placeholder="Cari aktivitas..." class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 mb-3 bg-gray-50 dark:bg-gray-900">
-          <div id="logListContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+          <div onclick="toggleSettingsAccordion('setAccDompet')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="ph ph-wallet text-lg text-emerald-500"></i>
+              <span class="text-xs font-bold">Master Dompet</span>
+            </div>
+            <i id="setAccIcon-setAccDompet" class="ph ph-caret-down text-xs text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div id="setAccDompet" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-4">
+            <div class="py-3 space-y-3">
+              <div id="dompetMasterList" class="space-y-2"></div>
+              <button onclick="openModal('modalInputDompet')" class="w-full py-2 bg-gray-200/60 dark:bg-gray-700/60 text-xs font-semibold rounded-xl">
+                + Tambah Dompet Baru
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+          <div onclick="toggleSettingsAccordion('setAccKategori')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="ph ph-tag text-lg text-purple-500"></i>
+              <span class="text-xs font-bold">Master Kategori Transaksi</span>
+            </div>
+            <i id="setAccIcon-setAccKategori" class="ph ph-caret-down text-xs text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div id="setAccKategori" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-4">
+            <div class="py-3 space-y-3">
+              <div id="categoryMasterList" class="space-y-2"></div>
+              <button onclick="openModal('modalInputCategory')" class="w-full py-2 bg-gray-200/60 dark:bg-gray-700/60 text-xs font-semibold rounded-xl">
+                + Tambah Kategori Baru
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+          <div onclick="toggleSettingsAccordion('setAccExport')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="ph ph-export text-lg text-amber-500"></i>
+              <span class="text-xs font-bold">Export Laporan</span>
+            </div>
+            <i id="setAccIcon-setAccExport" class="ph ph-caret-down text-xs text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div id="setAccExport" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-4">
+            <div class="py-3 grid grid-cols-2 gap-2">
+              <button onclick="exportToPDF()" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                <i class="ph ph-file-pdf text-base"></i> Export PDF
+              </button>
+              <button onclick="exportToExcel()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                <i class="ph ph-file-xls text-base"></i> Export Excel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+          <div onclick="toggleSettingsAccordion('setAccAudit')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
+            <div class="flex items-center gap-2.5">
+              <i class="ph ph-clock-counter-clockwise text-lg text-rose-500"></i>
+              <span class="text-xs font-bold">Audit Trail / Log Aktivitas</span>
+            </div>
+            <i id="setAccIcon-setAccAudit" class="ph ph-caret-down text-xs text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div id="setAccAudit" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-4">
+            <div class="py-3 space-y-2">
+              <input type="text" id="searchLogInput" onkeyup="renderActivityLogs()" placeholder="Cari aktivitas..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700 bg-white/50">
+              <div id="logListContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
 
-    <nav class="floating-footer z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 px-2 py-1.5">
-      <div class="grid grid-cols-4">
+    <nav class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-md glass-nav rounded-full px-2 py-2 shadow-xl">
+      <div class="grid grid-cols-5 items-center">
         <button onclick="switchTab('kas')" id="nav-kas" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400">
           <i class="ph ph-receipt text-lg"></i>
           <span class="text-[9px] font-semibold mt-0.5">Kas</span>
@@ -343,6 +396,13 @@
           <i class="ph ph-hand-coins text-lg"></i>
           <span class="text-[9px] font-semibold mt-0.5">Hutang</span>
         </button>
+        
+        <div class="flex items-center justify-center">
+          <button onclick="openModal('modalInputKas')" class="w-11 h-11 -mt-5 bg-gradient-to-tr from-blue-600 to-indigo-600 hover:scale-105 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/40 active:scale-95 transition">
+            <i class="ph ph-plus-bold text-xl"></i>
+          </button>
+        </div>
+
         <button onclick="switchTab('sokongan')" id="nav-sokongan" class="flex flex-col items-center justify-center text-gray-400">
           <i class="ph ph-heart text-lg"></i>
           <span class="text-[9px] font-semibold mt-0.5">Sokongan</span>
@@ -355,75 +415,75 @@
     </nav>
   </div>
 
-  <div id="modalInputKas" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalInputKas" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Tambah Transaksi Kas</h3>
         <button onclick="closeModal('modalInputKas')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddKas(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Tipe Transaksi</label>
-          <select id="kasTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <select id="kasTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
             <option value="MASUK">Pemasukan (+)</option>
             <option value="KELUAR">Pengeluaran (-)</option>
           </select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Pilih Dompet</label>
-          <select id="kasDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+          <select id="kasDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700"></select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Pilih Kategori</label>
-          <select id="kasCategorySelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+          <select id="kasCategorySelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700"></select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="kasJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="kasJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="kasKet" required placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="kasKet" required placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Transaksi</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Transaksi</button>
       </form>
     </div>
   </div>
 
-  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalTransfer" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Transfer Antar Dompet</h3>
         <button onclick="closeModal('modalTransfer')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitTransfer(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Dari Dompet</label>
-          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+          <select id="trfFrom" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700"></select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Ke Dompet</label>
-          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+          <select id="trfTo" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700"></select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="trfJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Proses Transfer</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md">Proses Transfer</button>
       </form>
     </div>
   </div>
 
-  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalAnalytics" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Analisis Grafik Keuangan</h3>
         <button onclick="closeModal('modalAnalytics')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
           <label class="text-[10px] font-semibold block mb-1">Dimensi</label>
-          <select id="chartDimensionSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <select id="chartDimensionSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
             <option value="dompet">Per Dompet</option>
             <option value="kategori">Per Kategori</option>
             <option value="flow">Cashflow (Masuk/Keluar)</option>
@@ -431,22 +491,22 @@
         </div>
         <div>
           <label class="text-[10px] font-semibold block mb-1">Tipe Grafik</label>
-          <select id="chartTypeSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <select id="chartTypeSelect" onchange="renderAnalyticsChart()" class="w-full px-2.5 py-1.5 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
             <option value="doughnut">Donut / Lingkaran</option>
             <option value="bar">Diagram Batang</option>
             <option value="line">Garis Trend</option>
           </select>
         </div>
       </div>
-      <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border dark:border-gray-700">
+      <div class="p-3 bg-white/40 dark:bg-gray-900/40 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
         <canvas id="kasChart" class="w-full max-h-56"></canvas>
       </div>
     </div>
   </div>
 
-  <div id="modalPayHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalPayHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm" id="payHutangTitle">Bayar Cicilan Hutang</h3>
         <button onclick="closeModal('modalPayHutang')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
@@ -454,111 +514,111 @@
         <input type="hidden" id="payHutangId">
         <div>
           <label class="text-[10px] font-semibold">Sumber Dompet</label>
-          <select id="cclDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600"></select>
+          <select id="cclDompetSelect" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700"></select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Jumlah Pembayaran (Rp)</label>
-          <input type="text" id="payHutangAmount" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="payHutangAmount" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Keterangan Cicilan</label>
-          <input type="text" id="payHutangKet" placeholder="Cicilan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="payHutangKet" placeholder="Cicilan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Pembayaran</button>
+        <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Pembayaran</button>
       </form>
     </div>
   </div>
 
-  <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalInputDompet" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Tambah Dompet Baru</h3>
         <button onclick="closeModal('modalInputDompet')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddDompet(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Nama Dompet</label>
-          <input type="text" id="newDompetName" required placeholder="Contoh: Rekening BCA" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="newDompetName" required placeholder="Contoh: Rekening BCA" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Dompet</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Dompet</button>
       </form>
     </div>
   </div>
 
-  <div id="modalInputCategory" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalInputCategory" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Tambah Kategori Baru</h3>
         <button onclick="closeModal('modalInputCategory')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddCategory(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Nama Kategori</label>
-          <input type="text" id="newCategoryName" required placeholder="Contoh: Hiburan, Operasional" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="newCategoryName" required placeholder="Contoh: Hiburan, Operasional" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Kategori</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Kategori</button>
       </form>
     </div>
   </div>
 
-  <div id="modalInputHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalInputHutang" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Catat Hutang / Piutang</h3>
         <button onclick="closeModal('modalInputHutang')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddHutang(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Tipe</label>
-          <select id="htgTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <select id="htgTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
             <option value="Hutang">Hutang (Saya Berhutang)</option>
             <option value="Piutang">Piutang (Orang Berhutang ke Saya)</option>
           </select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Nama Pihak Kedua</label>
-          <input type="text" id="htgNama" required placeholder="Nama orang/instansi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="htgNama" required placeholder="Nama orang/instansi..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="htgJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="htgJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="htgKet" placeholder="Catatan opsional..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="htgKet" placeholder="Catatan opsional..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan Catatan</button>
+        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Catatan</button>
       </form>
     </div>
   </div>
 
-  <div id="modalInputSokongan" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+  <div id="modalInputSokongan" class="modal fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-gray-700/50 pb-2">
         <h3 class="font-bold text-sm">Tambah Donasi Sokongan</h3>
         <button onclick="closeModal('modalInputSokongan')" class="text-gray-400 text-lg"><i class="ph ph-x"></i></button>
       </div>
       <form onsubmit="submitAddSokongan(event)" class="space-y-3">
         <div>
           <label class="text-[10px] font-semibold">Tipe Donasi</label>
-          <select id="sokonganTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <select id="sokonganTipe" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
             <option value="Pemasukan">Donasi Masuk</option>
             <option value="Pengeluaran">Penyaluran Donasi</option>
           </select>
         </div>
         <div>
           <label class="text-[10px] font-semibold">Nama Donatur / Penerima</label>
-          <input type="text" id="sokonganNama" required placeholder="Nama..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="sokonganNama" required placeholder="Nama..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Jumlah (Rp)</label>
-          <input type="text" id="sokonganJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="sokonganJumlah" oninput="formatNumberInput(this)" required placeholder="0" class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
         <div>
           <label class="text-[10px] font-semibold">Keterangan</label>
-          <input type="text" id="sokonganKet" placeholder="Keterangan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+          <input type="text" id="sokonganKet" placeholder="Keterangan..." class="w-full px-3 py-2 text-xs rounded-xl border dark:bg-gray-800 dark:border-gray-700">
         </div>
-        <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan Donasi</button>
+        <button type="submit" class="w-full py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md">Simpan Donasi</button>
       </form>
     </div>
   </div>
@@ -624,7 +684,7 @@
         return;
       }
       container.innerHTML = filtered.map(l => `
-        <div class="p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs space-y-0.5">
+        <div class="p-2.5 bg-white/40 dark:bg-gray-800/40 rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-xs space-y-0.5">
           <div class="flex justify-between items-center font-bold text-blue-600 dark:text-blue-400">
             <span>${l.user}</span>
             <span class="text-[9px] text-gray-400">${l.timestamp}</span>
@@ -705,7 +765,7 @@
         if (res.status === 'success') {
           currentUser = res.user;
           localStorage.setItem('user_kas', JSON.stringify(currentUser));
-          logActivity('Login', 'Berhasil masuk ke aplikasi');
+          logActivity('Login', 'Berhasil masuk aplikasi');
           showApp();
           showToast(`Selamat datang, ${currentUser.namaLengkap || currentUser.username}`, 'success');
         } else {
@@ -722,7 +782,6 @@
       document.getElementById('loginView').classList.remove('hidden');
     }
 
-    // SUPER FAST INSTANT DISPLAY DENGAN LOCAL STORAGE CACHE & PARALLEL FETCHING
     function showApp() {
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('appView').classList.remove('hidden');
@@ -731,7 +790,6 @@
       document.getElementById('profileNamaLengkap').value = currentUser.namaLengkap || '';
       document.getElementById('profileUsername').value = currentUser.username || '';
 
-      // 1. RENDER INSTAN DARI LOCAL CACHE (0.001 DETIK)
       renderKasList();
       renderHutangList();
       renderSokonganList();
@@ -739,7 +797,6 @@
       populateCategoryDropdowns();
       renderActivityLogs();
 
-      // 2. BACKGROUND SYNC PARALEL DARI SPREADSHEET
       syncAppData();
     }
 
@@ -751,13 +808,11 @@
           rawHutangItems = res.hutang || [];
           rawSokonganItems = res.sokongan || [];
 
-          // SIMPAN REFRESHED DATA KE CACHE
           localStorage.setItem('cache_kas', JSON.stringify(rawKasItems));
           localStorage.setItem('cache_wallets', JSON.stringify(walletList));
           localStorage.setItem('cache_hutang', JSON.stringify(rawHutangItems));
           localStorage.setItem('cache_sokongan', JSON.stringify(rawSokonganItems));
 
-          // UPDATE RENDERING Halaman Web
           renderKasList();
           renderHutangList();
           renderSokonganList();
@@ -773,13 +828,28 @@
         const nav = document.getElementById(`nav-${t}`);
         if (t === tabName) {
           el.classList.remove('hidden');
-          if (nav) nav.className = "flex flex-col items-center justify-center text-blue-600 dark:text-blue-400";
+          if (nav) nav.className = "flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 font-bold";
         } else {
           el.classList.add('hidden');
           if (nav) nav.className = "flex flex-col items-center justify-center text-gray-400";
         }
       });
       if (tabName === 'settings') renderActivityLogs();
+    }
+
+    // ACCORDION SETTINGS MENU EXPAND/COLLAPSE TOGGLE
+    function toggleSettingsAccordion(id) {
+      const content = document.getElementById(id);
+      const icon = document.getElementById(`setAccIcon-${id}`);
+      if (content.classList.contains('open')) {
+        content.style.maxHeight = '0px';
+        content.classList.remove('open');
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+      }
     }
 
     // KAS & DOMPET LOGIC
@@ -797,16 +867,16 @@
           if (isMasuk) totalMasuk += val; else totalKeluar += val;
 
           return `
-            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between p-3 bg-white/40 dark:bg-gray-800/40 rounded-2xl border border-gray-200/40 dark:border-gray-700/40">
               <div>
-                <p class="text-xs font-bold">${item.keterangan || item.Description || 'Transaksi'}</p>
+                <p class="text-xs font-bold">${item.keterangan || 'Transaksi'}</p>
                 <span class="text-[10px] text-gray-400">${item.dompet || 'Utama'} • ${item.kategori || 'Umum'}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-bold ${isMasuk ? 'text-emerald-500' : 'text-rose-500'}">
                   ${isBalanceVisible ? (isMasuk ? '+' : '-') + ' Rp ' + val.toLocaleString('id-ID') : '••••••••'}
                 </span>
-                <button onclick="deleteKas('${item.id || item.ID}')" class="text-gray-400 hover:text-rose-500 text-sm"><i class="ph ph-trash"></i></button>
+                <button onclick="deleteKas('${item.id}')" class="text-gray-400 hover:text-rose-500 text-sm p-1"><i class="ph ph-trash"></i></button>
               </div>
             </div>
           `;
@@ -835,9 +905,9 @@
 
       if (masterList) {
         masterList.innerHTML = walletList.map(w => `
-          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
+          <div class="flex justify-between items-center p-2.5 bg-white/40 dark:bg-gray-800/40 rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-xs font-semibold">
             <span>${w}</span>
-            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
+            <button onclick="deleteDompet('${w}')" class="text-rose-500 hover:underline"><i class="ph ph-trash text-sm"></i></button>
           </div>
         `).join('');
       }
@@ -855,9 +925,9 @@
       const masterList = document.getElementById('categoryMasterList');
       if (masterList) {
         masterList.innerHTML = categoryList.map(c => `
-          <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-gray-700/40 rounded-xl border border-gray-100 dark:border-gray-700 text-xs font-semibold">
+          <div class="flex justify-between items-center p-2.5 bg-white/40 dark:bg-gray-800/40 rounded-xl border border-gray-200/50 dark:border-gray-700/50 text-xs font-semibold">
             <span>${c}</span>
-            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash"></i></button>
+            <button onclick="deleteCategory('${c}')" class="text-rose-500 hover:underline"><i class="ph ph-trash text-sm"></i></button>
           </div>
         `).join('');
       }
@@ -879,7 +949,7 @@
     }
 
     function deleteCategory(name) {
-      showConfirm('Hapus Kategori', `Hapus kategori "${name}"?`, () => {
+      showConfirm('Hapus Kategori', `Apakah Anda yakin ingin menghapus kategori "${name}"?`, () => {
         categoryList = categoryList.filter(c => c !== name);
         localStorage.setItem('app_categories', JSON.stringify(categoryList));
         populateCategoryDropdowns();
@@ -898,7 +968,7 @@
 
       google.script.run.withSuccessHandler(res => {
         if (res.status === 'success') {
-          logActivity('Tambah Transaksi', `Kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
+          logActivity('Tambah Kas', `Kas ${tipe}: Rp ${jumlah.toLocaleString('id-ID')}`);
           showToast('Transaksi disimpan!', 'success');
           closeModal('modalInputKas');
           document.getElementById('kasJumlah').value = '';
@@ -909,10 +979,10 @@
     }
 
     function deleteKas(id) {
-      showConfirm('Hapus Transaksi', 'Apakah Anda yakin ingin menghapus transaksi ini?', () => {
+      showConfirm('Hapus Transaksi Kas', 'Apakah Anda yakin ingin menghapus transaksi ini?', () => {
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
-            logActivity('Hapus Transaksi', `Hapus kas ID: ${id}`);
+            logActivity('Hapus Transaksi Kas', `ID: ${id}`);
             syncAppData();
             showToast('Transaksi dihapus', 'success');
           }
@@ -956,7 +1026,7 @@
     }
 
     function deleteDompet(name) {
-      showConfirm('Hapus Dompet', `Hapus dompet "${name}"?`, () => {
+      showConfirm('Hapus Dompet', `Apakah Anda yakin ingin menghapus dompet "${name}"?`, () => {
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
             logActivity('Hapus Dompet', `Menghapus dompet: ${name}`);
@@ -967,7 +1037,7 @@
       });
     }
 
-    // ACCORDION HUTANG SMOOTH DETIL & CICILAN
+    // ACCORDION HUTANG SMOOTH DETIL & HAPUS HUTANG
     function renderHutangList() {
       const container = document.getElementById('hutangListContainer');
       let totalHutang = 0, totalSisa = 0;
@@ -976,9 +1046,9 @@
         container.innerHTML = `<p class="text-xs text-center py-6 text-gray-400">Belum ada catatan hutang.</p>`;
       } else {
         container.innerHTML = rawHutangItems.map(h => {
-          const jml = Number(h.jumlah || h.Jumlah || 0);
-          const ssa = Number(h.sisa || h.Sisa || 0);
-          const stus = h.status || h.Status;
+          const jml = Number(h.jumlah || 0);
+          const ssa = Number(h.sisa || 0);
+          const stus = h.status || 'Belum Lunas';
           totalHutang += jml;
           totalSisa += ssa;
 
@@ -986,8 +1056,8 @@
           const cicilanList = h.cicilanHistory || [];
 
           return `
-            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-              <div onclick="toggleHutangAccordion('${h.id}')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+            <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+              <div onclick="toggleHutangAccordion('${h.id}')" class="p-3.5 flex justify-between items-center cursor-pointer hover:bg-gray-200/30 dark:hover:bg-gray-700/30 transition">
                 <div>
                   <div class="flex items-center gap-2 mb-0.5">
                     <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${h.tipe === 'Hutang' ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}">${h.tipe}</span>
@@ -1004,10 +1074,10 @@
                 </div>
               </div>
 
-              <div id="accContent-${h.id}" class="accordion-content bg-gray-50 dark:bg-gray-900/50 px-3.5 border-t border-gray-100 dark:border-gray-700">
+              <div id="accContent-${h.id}" class="accordion-content border-t border-gray-200/50 dark:border-gray-700/50 px-3.5">
                 <div class="py-3 space-y-2">
                   <p class="text-[10px] text-gray-500"><strong>Keterangan:</strong> ${h.keterangan || '-'}</p>
-                  <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <div class="border-t border-gray-200/50 dark:border-gray-700/50 pt-2">
                     <span class="text-[10px] font-bold block mb-1">Riwayat Cicilan Pembayaran:</span>
                     ${!cicilanList.length ? '<p class="text-[10px] text-gray-400">Belum ada cicilan.</p>' : 
                       cicilanList.map(c => `<div class="flex justify-between text-[10px] py-0.5"><span class="text-gray-400">${c.date}</span><span class="font-semibold text-emerald-500">Rp ${Number(c.amount).toLocaleString('id-ID')}</span></div>`).join('')
@@ -1015,7 +1085,7 @@
                   </div>
                   <div class="pt-2 flex justify-end gap-2">
                     ${!isLunas ? `<button onclick="openPayHutangModal('${h.id}', '${h.nama}')" class="px-3 py-1 bg-emerald-600 text-white rounded-xl text-[10px] font-bold shadow-sm">Bayar Cicilan</button>` : ''}
-                    <button onclick="deleteHutang('${h.id}')" class="px-3 py-1 bg-rose-500/10 text-rose-500 rounded-xl text-[10px] font-bold">Hapus</button>
+                    <button onclick="deleteHutang('${h.id}')" class="px-3 py-1 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-[10px] font-bold transition">Hapus</button>
                   </div>
                 </div>
               </div>
@@ -1084,7 +1154,7 @@
     }
 
     function deleteHutang(id) {
-      showConfirm('Hapus Catatan', 'Hapus catatan hutang ini?', () => {
+      showConfirm('Hapus Catatan Hutang', 'Apakah Anda yakin ingin menghapus catatan ini?', () => {
         google.script.run.withSuccessHandler(res => {
           if (res.status === 'success') {
             logActivity('Hapus Hutang', `Hapus hutang ID: ${id}`);
@@ -1095,7 +1165,7 @@
       });
     }
 
-    // DANA SOKONGAN INDEPENDEN
+    // DANA SOKONGAN & HAPUS SOKONGAN
     function renderSokonganList() {
       const container = document.getElementById('sokonganListContainer');
       let totalSokongan = 0;
@@ -1108,12 +1178,15 @@
           totalSokongan += val;
 
           return `
-            <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="flex items-center justify-between p-3 glass-card rounded-2xl shadow-sm">
               <div>
                 <p class="text-xs font-bold">${s.nama}</p>
                 <span class="text-[10px] text-gray-400">${s.date ? new Date(s.date).toLocaleDateString('id-ID') : ''}</span>
               </div>
-              <span class="text-xs font-bold text-emerald-500">+ Rp ${val.toLocaleString('id-ID')}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-emerald-500">+ Rp ${val.toLocaleString('id-ID')}</span>
+                <button onclick="deleteSokongan('${s.id}')" class="text-gray-400 hover:text-rose-500 text-sm p-1"><i class="ph ph-trash"></i></button>
+              </div>
             </div>
           `;
         }).join('');
@@ -1137,6 +1210,18 @@
           syncAppData();
         }
       }).processClientRequest({ action: 'addSokongan', tipe: tipe, nama: nama, jumlah: jumlah, keterangan: ket });
+    }
+
+    function deleteSokongan(id) {
+      showConfirm('Hapus Sokongan', 'Apakah Anda yakin ingin menghapus data sokongan ini?', () => {
+        google.script.run.withSuccessHandler(res => {
+          if (res.status === 'success') {
+            logActivity('Hapus Sokongan', `Hapus sokongan ID: ${id}`);
+            syncAppData();
+            showToast('Data sokongan dihapus', 'success');
+          }
+        }).processClientRequest({ action: 'deleteSokongan', id: id });
+      });
     }
 
     // PROFIL & EXPORT
@@ -1201,7 +1286,7 @@
       showToast('Laporan PDF diunduh', 'success');
     }
 
-    // ANALYTICS & CHART.JS
+    // ANALYTICS CHART
     function openAnalyticsModal() {
       openModal('modalAnalytics');
       renderAnalyticsChart();
@@ -1233,7 +1318,7 @@
       } else {
         let masuk = 0, keluar = 0;
         rawKasItems.forEach(i => {
-          let t = i.tipe || i.Type;
+          let t = i.tipe;
           let val = Number(i.jumlah || 0);
           if (t === 'MASUK' || t === 'Pemasukan') masuk += val; else keluar += val;
         });
